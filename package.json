@@ -8,8 +8,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "arquitectura": "depcruise src launcher definiciones",
-    "format": "prettier --no-error-on-unmatched-pattern --write 'src/**/*.ts' 'launcher/**/*.ts' 'local/**/*.ts' 'definiciones/**/*.ts' vitest.config.ts 'e2e/**/*.ts' playwright.config.ts",
-    "format:check": "prettier --no-error-on-unmatched-pattern --check 'src/**/*.ts' 'launcher/**/*.ts' 'local/**/*.ts' 'definiciones/**/*.ts' vitest.config.ts 'e2e/**/*.ts' playwright.config.ts",
+    "format": "prettier --no-error-on-unmatched-pattern --write 'src/**/*.ts' 'launcher/**/*.ts' 'local/**/*.{ts,js,css,html}' 'definiciones/**/*.ts' vitest.config.ts 'e2e/**/*.ts' playwright.config.ts",
+    "format:check": "prettier --no-error-on-unmatched-pattern --check 'src/**/*.ts' 'launcher/**/*.ts' 'local/**/*.{ts,js,css,html}' 'definiciones/**/*.ts' vitest.config.ts 'e2e/**/*.ts' playwright.config.ts",
     "verify": "pnpm typecheck && pnpm format:check && pnpm legibilidad && pnpm arquitectura && pnpm test",
     "dev": "node --env-file=.env --import tsx launcher/main.ts",
     "start": "node --import tsx launcher/main.ts",
@@ -21,6 +21,7 @@
     "legibilidad": "node scripts/lineas-largas.mjs",
     "e2e:smoke": "playwright test e2e/smoke",
     "e2e:critical": "playwright test e2e/critical",
+    "e2e:simulador": "playwright test e2e/simulador",
     "e2e": "playwright test"
   },
   "dependencies": {

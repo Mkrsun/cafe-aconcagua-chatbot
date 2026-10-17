@@ -1,29 +1,10 @@
 import pg from "pg";
-import {
-  Conflicto,
-  DatosInvalidos,
-  FalloExterno,
-  NoEncontrado,
-} from "../src/plataforma/errores.js";
 import { relojDelSistema } from "../src/plataforma/reloj.js";
 import { leerConfiguracion } from "./config/configuracion.js";
 import { crearAplicacion } from "./composicion/aplicacion.js";
 import { bordesReales } from "./composicion/bordes.js";
 import { ejecutarBandeja } from "./operacion/bandeja/comandos.js";
-
-const FUERA_DE_VENTANA =
-  "Pasaron más de 24 horas desde el último mensaje del cliente: WhatsApp solo deja enviar " +
-  "plantillas aprobadas. Espera a que el cliente escriba o llámalo.";
-
-/** Lo que se le explica a quien opera, sin trazas internas. */
-function explicar(error: unknown) {
-  if (error instanceof Conflicto && error.codigo === "fuera-de-ventana")
-    return FUERA_DE_VENTANA;
-  if (error instanceof DatosInvalidos) return error.detalle;
-  if (error instanceof NoEncontrado || error instanceof FalloExterno)
-    return error.message;
-  return error instanceof Error ? error.message : String(error);
-}
+import { explicar } from "./operacion/bandeja/explicar.js";
 
 /**
  * `pnpm bandeja …`: el equipo atiende las conversaciones desde la terminal, con la misma

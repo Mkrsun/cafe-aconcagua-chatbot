@@ -38,18 +38,22 @@ docker compose up -d
 pnpm semilla
 
 # 4. El servidor real con WhatsApp y Khipu dobles y el modelo real de OpenAI
-pnpm local
+pnpm local                      # abre el simulador en http://localhost:8093/
 
-# 5. En otra terminal, conversa como cliente
-pnpm conversar                  # Ana Pérez, minorista
-pnpm conversar --cliente mayorista   # Emporio Dos Hermanos
+# 5. Prueba en el simulador: escribe como cliente y atiende como el equipo
 ```
 
-En `pnpm conversar` cada línea es un mensaje de WhatsApp. Puedes mandar varias seguidas: el chatbot espera a
-que termines y responde una vez. Para elegir una opción de los botones o de la lista, escribe su número. Los
-comandos son `/ubicacion` (comparte una ubicación de ejemplo), `/pagar` (simula que Khipu confirma el pago del
-último enlace), `/ayuda` y `/salir`. En una tercera terminal, `pnpm bandeja` muestra lo que vería el equipo,
-por ejemplo una conversación pausada después de `quiero hablar con una persona`.
+El **simulador** (solo local) tiene a la izquierda el teléfono del cliente: Ana Pérez (minorista) o Emporio
+Dos Hermanos (mayorista), con los botones y listas del chatbot para tocar, «Compartir ubicación» y «Simular
+pago». A la derecha está el equipo: la bandeja (responder, tomar, pausar, resolver), los avisos que recibió por
+WhatsApp y el gasto del modelo del mes (llamadas, tokens y dólares si hay tarifa). Vive en el servidor de los
+dobles de `pnpm local`, en 127.0.0.1: el servidor del producto sigue sin pantallas.
+
+Sin navegador, lo mismo desde la terminal: `pnpm conversar` (`--cliente mayorista`) escribe como cliente
+(botones y listas con su número, `/ubicacion`, `/pagar`, `/ayuda`, `/salir`) y `pnpm bandeja` atiende como el
+equipo.
+
+Qué consume tokens, cuánto cuesta y cómo conectar otro proveedor del modelo: `SETUP.md`, punto 9.
 
 La semilla y el modo local solo aceptan una base de tu computador cuyo nombre empiece por `cafe_dev` (o
 `cafe_test` en las pruebas), y nunca corren con `CAFE_ENV=produccion`. Las esperas son las del producto: unos
@@ -106,11 +110,12 @@ pnpm bandeja ver 56933334444                   # el hilo, por teléfono del clie
 pnpm bandeja responder 56933334444 --como Glei Hola, te llamo en cinco minutos
 pnpm bandeja tomar 56933334444 --como Glei     # te la asignas sin escribir
 pnpm bandeja pausar 56933334444 [motivo]       # el chatbot deja de responder ahí
-pnpm bandeja reanudar 56933334444              # el chatbot vuelve a atender
-pnpm bandeja resolver 56933334444              # cierra la conversación
+pnpm bandeja reanudar 56933334444              # quita la pausa (si nadie la tomó, sigue el chatbot)
+pnpm bandeja resolver 56933334444              # la cierra: el próximo mensaje lo atiende el chatbot
 ```
 
-`pnpm bandeja` usa la misma configuración del servidor: la base y el WhatsApp reales. Responder solo funciona
+Una conversación que alguien del equipo tomó o respondió queda a su cargo hasta que la **resuelve**; reanudarla
+solo quita la pausa. `pnpm bandeja` usa la misma configuración del servidor: la base y el WhatsApp reales. Responder solo funciona
 dentro de las 24 horas desde el último mensaje del cliente, porque fuera de ese plazo WhatsApp solo admite
 plantillas aprobadas.
 
@@ -162,7 +167,7 @@ arranque lo rechaza. El servidor no tiene más rutas: no hay admin ni API de ope
 | `KHIPU_API_KEY` | Cobro por Khipu (sin ella, el pedido confirmado pasa a la encargada) | — |
 | `KHIPU_BASE_URL` | Base de la API de Khipu (solo pruebas) | `https://payment-api.khipu.com/v3` |
 | `KHIPU_NOTIFY_URL` | URL pública de `/payments/khipu/webhook` que se le pasa a Khipu | — |
-| `CAFE_DOBLES_PUERTO` | Solo `pnpm local` y `pnpm conversar`: puerto de los dobles de WhatsApp y Khipu | `8093` |
+| `CAFE_DOBLES_PUERTO` | Solo local: puerto de los dobles de WhatsApp y Khipu y del simulador | `8093` |
 
 ## Comandos
 
@@ -173,7 +178,7 @@ pnpm format        # prettier
 pnpm cargar        # definiciones/ → base de datos (y --clientes archivo.json)
 pnpm bandeja       # atender conversaciones (pnpm bandeja ayuda)
 pnpm semilla       # datos de ejemplo en la base de desarrollo
-pnpm local         # servidor real con WhatsApp y Khipu dobles
+pnpm local         # servidor real con WhatsApp y Khipu dobles, y el simulador web
 pnpm conversar     # conversar como cliente con el modo local
 ```
 
@@ -185,10 +190,12 @@ de WhatsApp, del modelo y de Khipu. El cliente escribe por el webhook y el equip
 ```bash
 pnpm e2e:smoke     # el servidor arranca y solo expone la salud y los webhooks
 pnpm e2e:critical  # pedido completo, traspaso con respuesta del equipo y cambio de precio
-pnpm e2e           # las dos
+pnpm e2e:simulador # el simulador de pnpm local en Chromium (pedido, pago, gasto y bandeja)
+pnpm e2e           # las tres
 ```
 
-La base de los e2e sale de `CAFE_E2E_DATABASE_URL` (por defecto `postgresql://cafe@127.0.0.1:55432/cafe_test`)
+La suite del simulador usa Chromium: el preinstalado en `/opt/pw-browsers` si existe, o el de
+`pnpm exec playwright install chromium` (una vez). La base de los e2e sale de `CAFE_E2E_DATABASE_URL` (por defecto `postgresql://cafe@127.0.0.1:55432/cafe_test`)
 y solo acepta bases `cafe_test*`. `E2E_WORKERS` fija cuántas pruebas corren a la vez (2 por defecto). El
 reporte queda en `e2e/.resultados/html`.
 

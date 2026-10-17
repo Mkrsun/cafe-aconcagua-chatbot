@@ -17,5 +17,6 @@ export function direccionesLocales(env: Entorno) {
     puertoDeLosDobles: dobles,
     servidor: `http://127.0.0.1:${servidor}`,
     dobles: `http://127.0.0.1:${dobles}`,
+    simulador: `http://localhost:${dobles}/`,
   };
 }

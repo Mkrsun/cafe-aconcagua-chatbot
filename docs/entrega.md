@@ -76,14 +76,14 @@ WhatsApp. En la terminal del servidor:
 pnpm bandeja                                         # las que esperan a una persona
 pnpm bandeja ver 56933334444                         # el hilo completo, con el motivo y el resumen
 pnpm bandeja responder 56933334444 --como Glei Hola, te llamo en cinco minutos
-pnpm bandeja reanudar 56933334444                    # el chatbot vuelve a atender
-pnpm bandeja resolver 56933334444                    # cierra la conversación
+pnpm bandeja resolver 56933334444                    # la cierra: el chatbot vuelve a atender
 ```
 
 Una conversación se busca por el teléfono del cliente o por su id. Tu respuesta le llega al cliente por el
 mismo WhatsApp y la conversación queda a tu cargo, así que el chatbot no se mete. Cuando termines,
-**reanudar** se la devuelve al chatbot y **resolver** la cierra. Con **pausar** detienes al chatbot en una
-conversación que quieras llevar tú, y con **tomar** te la asignas sin escribir. `pnpm bandeja ayuda` muestra
+**resolver** la cierra y el próximo mensaje del cliente lo atiende el chatbot. **Reanudar** solo quita la
+pausa de una conversación que nadie tomó. Con **pausar** detienes al chatbot en una conversación que quieras
+llevar tú, y con **tomar** te la asignas sin escribir. `pnpm bandeja ayuda` muestra
 todos los comandos.
 
 **Cambiar un precio, una zona o una pregunta**: edita el archivo de `definiciones/`, revisa el cambio con
@@ -103,11 +103,10 @@ resumen:
 3. **Datos de ejemplo**: `pnpm semilla` carga el catálogo de Café con precios de ejemplo en seis formatos, dos
    zonas de despacho, una clienta minorista (Ana Pérez), un cliente mayorista (Emporio Dos Hermanos) y tres
    preguntas frecuentes.
-4. **Arrancar**: `pnpm local`.
-5. **Conversar como cliente**: en otra terminal, `pnpm conversar` (o `pnpm conversar --cliente mayorista`).
-   Escribes como en WhatsApp. Los botones y las listas salen numerados y eliges con el número. `/ubicacion`
-   comparte una ubicación de ejemplo, `/pagar` simula que Khipu confirma el pago y `/salir` termina.
-6. **Atender como el equipo**: en una tercera terminal, `pnpm bandeja`.
+4. **Arrancar**: `pnpm local`. Se abre el **simulador** en el navegador (http://localhost:8093/).
+5. **Probar**: a la izquierda escribes como el cliente (Ana o Emporio) y tocas los botones del chatbot; a la
+   derecha atiendes como el equipo (bandeja, avisos) y ves el gasto del modelo. También se puede desde la
+   terminal con `pnpm conversar` y `pnpm bandeja`.
 
 **Publicar en producción queda a cargo de Café**: el hosting (un servidor con PostgreSQL 16 y una dirección
 pública con HTTPS), el número real de WhatsApp en la app de Meta con sus plantillas aprobadas, y la cuenta real
@@ -143,7 +142,7 @@ reglas. El camino para cualquier cambio:
 1. **Pide el cambio en simple** («quiero que el despacho a regiones cueste distinto»).
 2. Pídele a Claude que agregue o ajuste las **pruebas** del cambio junto con el código.
 3. Antes de dar algo por bueno: `pnpm verify` en verde y, si el cambio toca una conversación, `pnpm e2e`.
-4. Prueba el cambio en local con `pnpm local`, `pnpm conversar` y `pnpm bandeja` (ver `SETUP.md`).
+4. Prueba el cambio en local con `pnpm local` y el simulador (ver `SETUP.md`).
 
 Las líneas rojas no se negocian, ni siquiera a pedido: el precio sale del catálogo y nunca del modelo; el
 consentimiento del cliente manda; fuera de la ventana de 24 horas solo salen plantillas; el aviso al equipo no

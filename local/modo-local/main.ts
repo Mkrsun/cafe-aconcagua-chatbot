@@ -4,38 +4,48 @@ import { iniciarDobles } from "../../e2e/dobles/servidor.js";
 import { exigirBaseArriba } from "../base-de-desarrollo.js";
 import { direccionesLocales } from "../entorno-de-desarrollo.js";
 import { bienvenida } from "./bienvenida.js";
+import { abrirNavegador } from "./navegador.js";
+import { simuladorLocal } from "./simulador.js";
 import { entornoLocal } from "./entorno-local.js";
 import { arrancarProducto } from "./producto.js";
 import { exigirPuertoLibre } from "./puertos.js";
 
-/** `pnpm local`: dobles de WhatsApp y Khipu, y el servidor real con el modelo real. */
+/** `pnpm local`: dobles de WhatsApp y Khipu, el simulador web y el servidor real con el modelo. */
 async function main() {
   const direcciones = direccionesLocales(process.env);
   const entorno = entornoLocal(process.env, direcciones.dobles);
   await exigirBaseArriba(entorno.DATABASE_URL!);
   await exigirPuertoLibre(direcciones.puertoDelServidor, "CAFE_PUERTO");
   await exigirPuertoLibre(direcciones.puertoDeLosDobles, "CAFE_DOBLES_PUERTO");
+  const { simulador, cerrar: cerrarSimulador } = await simuladorLocal(
+    entorno,
+    direcciones,
+  );
   const dobles = await iniciarDobles({
     puerto: direcciones.puertoDeLosDobles,
-    dobles: [crearGraph(), crearKhipu()],
+    dobles: [crearGraph(), crearKhipu(), simulador],
   });
   const producto = await arrancarProducto(entorno, direcciones.servidor).catch(
     async (error: unknown) => {
       await dobles.cerrar();
+      await cerrarSimulador();
       throw error;
     },
   );
   console.log(
     bienvenida({
       dobles: direcciones.dobles,
+      simulador: direcciones.simulador,
       modelo: entorno.CAFE_MODELO ?? "gpt-6-luna",
     }),
   );
+  abrirNavegador(direcciones.simulador);
   let cerrando = false;
   const cerrar = async () => {
     cerrando = true;
     await producto.cerrar();
     await dobles.cerrar();
+    await cerrarSimulador();
     process.exit(0);
   };
   process.once("SIGINT", cerrar);

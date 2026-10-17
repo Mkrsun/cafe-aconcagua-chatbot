@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Simulador · Café Aconcagua Chatbot</title>
+    <link rel="stylesheet" href="/simulador/estilos.css" />
+  </head>
+  <body>
+    <header class="cabecera">
+      <h1>Café Aconcagua Chatbot · simulador local</h1>
+      <p>
+        WhatsApp y Khipu son simulados: no sale ningún mensaje ni se cobra nada.
+        El modelo es el real y cada respuesta del chatbot consume tokens.
+      </p>
+    </header>
+
+    <main class="grilla">
+      <section class="telefono" aria-labelledby="titulo-telefono">
+        <div class="telefono__barra">
+          <h2 id="titulo-telefono">Teléfono del cliente</h2>
+          <label class="campo">
+            <span>Cliente</span>
+            <select id="cliente"></select>
+          </label>
+        </div>
+        <ol id="hilo" class="hilo" aria-label="Conversación"></ol>
+        <p id="estado-chat" class="estado-chat" role="status"></p>
+        <div class="atajos">
+          <button type="button" id="ubicacion">📍 Compartir ubicación</button>
+          <button type="button" id="pagar">💳 Simular pago</button>
+        </div>
+        <form id="escribir" class="escribir">
+          <label for="mensaje" class="oculto">Mensaje</label>
+          <textarea
+            id="mensaje"
+            rows="2"
+            placeholder="Escribe como el cliente (Enter envía, Mayús+Enter salta de línea)"
+          ></textarea>
+          <button type="submit">Enviar</button>
+        </form>
+        <p id="error-chat" class="error" role="alert"></p>
+      </section>
+
+      <section class="panel" aria-labelledby="titulo-equipo">
+        <h2 id="titulo-equipo">Equipo de Café</h2>
+        <label class="campo">
+          <span>Tu nombre</span>
+          <input id="como" value="Rodo" autocomplete="off" />
+        </label>
+
+        <section aria-labelledby="titulo-bandeja">
+          <h3 id="titulo-bandeja">Bandeja</h3>
+          <ul
+            id="bandeja"
+            class="bandeja"
+            aria-label="Conversaciones abiertas"
+          ></ul>
+          <p id="resultado-bandeja" class="resultado" role="status"></p>
+        </section>
+
+        <section aria-labelledby="titulo-avisos">
+          <h3 id="titulo-avisos">Avisos que recibió el equipo por WhatsApp</h3>
+          <ul id="avisos" class="avisos" aria-label="Avisos al equipo"></ul>
+        </section>
+
+        <section aria-labelledby="titulo-gasto">
+          <h3 id="titulo-gasto">Gasto del modelo este mes</h3>
+          <dl id="gasto" class="gasto"></dl>
+          <p class="nota">
+            Una llamada al modelo por cada tanda de mensajes del cliente. Para
+            ver dólares, define
+            <code>CAFE_MODELO_TARIFA_USD_POR_MTOK</code> en
+            <code>.env</code> (SETUP.md, punto 9).
+          </p>
+        </section>
+      </section>
+    </main>
+
+    <script src="/simulador/app.js" type="module"></script>
+  </body>
+</html>

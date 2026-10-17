@@ -88,6 +88,25 @@ describirConPostgres("modo local con un modelo de prueba", () => {
     expect(local.salida()).not.toMatch(/admin/i);
   });
 
+  it("sirve el simulador web: la página, los clientes de la semilla y su estado", async () => {
+    const base = `http://127.0.0.1:${puertos.dobles}`;
+    expect(local.salida()).toContain(`http://localhost:${puertos.dobles}/`);
+    expect(await (await fetch(`${base}/`)).text()).toContain(
+      "Teléfono del cliente",
+    );
+    const clientes = await (
+      await fetch(`${base}/simulador/api/clientes`)
+    ).json();
+    expect(clientes.map((c: { nombre: string }) => c.nombre)).toContain(
+      ANA.nombre,
+    );
+    const estado = await (
+      await fetch(`${base}/simulador/api/estado?telefono=${ANA.telefono}`)
+    ).json();
+    expect(estado).toMatchObject({ estado: "libre", bandeja: [] });
+    expect(estado.gasto).toMatchObject({ llamadas: 0 });
+  });
+
   it("la CLI manda una ráfaga y recibe una sola respuesta con sus opciones", async () => {
     await fetch(`${modelo.base}/__dobles/modelo/guion`, {
       method: "POST",

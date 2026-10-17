@@ -48,8 +48,8 @@ Si es tu primera vez aquí, lee `README.md` y `SETUP.md` (cómo levantarlo y pro
 | `src/faq/` | Preguntas frecuentes (borrador/publicada, sin montos) |
 | `src/atencion/` | Orquestación: recibir el webhook, despachar lotes vencidos y entregar la respuesta |
 | `launcher/` | Raíz de composición, configuración por entorno y los ejecutables: `main.ts` (servidor), `cargar.ts` y `bandeja.ts` (comandos del equipo) |
-| `e2e/` | Playwright sin navegador: `smoke` y `critical`, con el servidor real, una base `cafe_test_e2e_*` por prueba y dobles HTTP (`e2e/dobles`) |
-| `local/` | Probar en local: `semilla` (datos de ejemplo), `modo-local` (servidor real con WhatsApp y Khipu dobles) y `conversar` (CLI del cliente). Como `e2e/`, fuera de `pnpm arquitectura` |
+| `e2e/` | Playwright: `smoke` y `critical` sin navegador y `simulador` en Chromium, con el servidor real, una base `cafe_test_e2e_*` por prueba y dobles HTTP (`e2e/dobles`) |
+| `local/` | Probar en local: `semilla` (datos de ejemplo), `modo-local` (servidor real con WhatsApp y Khipu dobles), `simulador` (página web solo local: teléfono del cliente, bandeja y gasto) y `conversar` (CLI del cliente). Como `e2e/`, fuera de `pnpm arquitectura` |
 | `migrations/` | SQL de PostgreSQL (esquema `cafe`), numeradas e idempotentes |
 
 Una feature importa a otra solo por su `index.ts`, sus `puertos/` o su `dominio/`.
@@ -65,9 +65,13 @@ pnpm arquitectura            # dependency-cruiser (0 violaciones)
 pnpm dev                     # servidor en :8092 (lee .env): /salud y los webhooks
 pnpm cargar [--clientes archivo.json]   # deja la base igual a definiciones/ (y carga clientes)
 pnpm bandeja [comando]       # el equipo atiende conversaciones (pnpm bandeja ayuda)
-pnpm e2e:smoke | e2e:critical | e2e   # punta a punta (sin navegador)
-pnpm semilla | local | conversar       # probar en local; solo bases cafe_dev*
+pnpm e2e:smoke | e2e:critical | e2e:simulador | e2e   # punta a punta
+pnpm semilla | local | conversar       # probar en local (local abre el simulador); solo cafe_dev*
 ```
+
+La suite `e2e:simulador` usa el Chromium preinstalado de `/opt/pw-browsers`: en el entorno de los agentes
+nunca se ejecuta `playwright install`. El simulador vive solo en `local/` (servidor de los dobles, 127.0.0.1)
+y no es superficie del producto.
 
 Pruebas con base de datos: `DATABASE_URL=postgresql://cafe@127.0.0.1:55432/cafe_test pnpm verify`. Las suites
 de PostgreSQL vacían tablas: solo aceptan una base `cafe_test*` y fallan con cualquier otra. Si varias ramas

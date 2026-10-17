@@ -20,7 +20,7 @@ const numeradas = (opciones: readonly OpcionElegible[]) =>
       `  ${i + 1}) ${o.titulo}${o.descripcion ? ` · ${o.descripcion}` : ""}`,
   );
 
-function opcionesDe(m: MensajeEnviado): OpcionElegible[] {
+export function opcionesDe(m: MensajeEnviado): OpcionElegible[] {
   const accion = m.interactivo?.action;
   if (m.interactivo?.type === "button")
     return (accion?.buttons ?? []).map(({ reply }) => ({

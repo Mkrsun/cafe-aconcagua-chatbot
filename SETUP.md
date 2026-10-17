@@ -42,7 +42,8 @@ ballena) mientras pruebas. Si no quieres Docker, puedes usar un PostgreSQL 16 in
 
 1. Entra a https://platform.openai.com con tu cuenta (o crea una).
 2. En **Billing**, agrega un medio de pago. OpenAI cobra **por uso**: una conversación de prueba cuesta
-   centavos de dólar. Puedes poner un tope mensual en **Limits** para quedarte tranquilo.
+   centavos de dólar. Puedes poner un tope mensual en **Limits** para quedarte tranquilo. (Qué consume
+   tokens, cuánto cuesta y cómo usar otro proveedor: punto 9.)
 3. En **API keys** (https://platform.openai.com/api-keys), crea una clave nueva y cópiala. Empieza por
    `sk-`. Guárdala: OpenAI la muestra una sola vez.
 
@@ -151,102 +152,77 @@ Muestra:
 
 ```
 Café Aconcagua está corriendo en modo local.
+  Simulador:        http://localhost:8093/ (se abre en el navegador)
   Modelo:           gpt-6-luna (real, con tu OPENAI_API_KEY)
   WhatsApp y Khipu: dobles en http://127.0.0.1:8093 (no sale ningún mensaje ni cobro real)
 
-Para conversar como cliente, en otra terminal: pnpm conversar
-  (o pnpm conversar --cliente mayorista)
-Para atender como el equipo: pnpm bandeja (pnpm bandeja ayuda muestra los comandos)
+En el simulador escribes como cliente y atiendes como el equipo, con el gasto a la vista.
+Si prefieres la terminal: pnpm conversar (cliente) y pnpm bandeja (equipo).
 Ctrl+C cierra todo.
 ```
 
-Deja esta terminal abierta: mientras siga abierta, el
-chatbot está funcionando. Para apagarlo, vuelve a ella y presiona `Ctrl+C`.
+y abre solo el **simulador** en tu navegador (si no se abre, copia la dirección `http://localhost:8093/`). Deja
+la terminal abierta: mientras siga abierta, el chatbot está funcionando. Para apagarlo, vuelve a ella y
+presiona `Ctrl+C`.
+
+**El simulador** tiene dos partes:
+
+- **A la izquierda, el teléfono del cliente.** Arriba eliges si escribes como **Ana Pérez** (minorista) o como
+  **Emporio Dos Hermanos** (mayorista, con sus precios). Escribes abajo y Enter envía. Los botones y las
+  listas del chatbot se tocan con el mouse. «📍 Compartir ubicación» manda una ubicación de ejemplo y
+  «💳 Simular pago» hace que Khipu confirme el último cobro.
+- **A la derecha, el equipo de Café.** La **bandeja** con las conversaciones abiertas: las que esperan a una
+  persona aparecen destacadas, con el motivo. Ahí respondes (lo ves llegar al teléfono de la izquierda),
+  tomas, pausas o resuelves. Debajo, los **avisos** que el equipo recibió por WhatsApp y el **gasto del
+  modelo** del mes: cuántas llamadas, cuántos tokens y, si configuraste la tarifa, cuántos dólares (punto 9).
 
 ## 6. Probar una conversación
 
-Abre **otra terminal**, entra a la misma carpeta (`cd cafe-aconcagua-chatbot`) y corre:
-
-```bash
-pnpm conversar
-```
-
-Ahora eres **Ana Pérez** escribiéndole al WhatsApp de Café. (Con `pnpm conversar --cliente mayorista` eres
-Emporio Dos Hermanos y ves los precios mayoristas.)
-
-Cómo se usa:
-
-- Cada línea que escribes y confirmas con Enter es un mensaje de WhatsApp. Puedes mandar varias seguidas,
-  como lo hace un cliente: el chatbot espera a que termines y responde **una sola vez** a todo.
-- Mientras espera verás `… El chatbot espera a que termines de escribir`, y cuando se pone a responder,
-  `… El chatbot está escribiendo`.
-- Cuando el chatbot manda botones o una lista, salen numerados: escribe **solo el número** para elegir.
-- `/ubicacion` comparte una ubicación de ejemplo (Plaza Ñuñoa), `/pagar` simula que Khipu confirma el pago
-  del último botón «Pagar», `/ayuda` muestra los comandos y `/salir` termina.
+En el simulador estás escribiéndole al WhatsApp de Café como **Ana Pérez**. Cada Enter es un mensaje: puedes
+mandar varios seguidos, como un cliente. El chatbot espera a que termines y responde **una sola vez** a todo;
+mientras tanto, bajo el chat dice «El chatbot espera a que termines de escribir…» y luego «El chatbot está
+escribiendo…».
 
 Un ejemplo paso a paso (las palabras del chatbot cambian, porque las escribe el modelo; los precios y el total
 no, porque salen del catálogo):
 
-1. Escribe tres mensajes seguidos, sin esperar:
+1. Escribe tres mensajes seguidos, sin esperar: `hola buenas`, `quiero café para Ñuñoa` y
+   `¿qué futaleufú tienen?`. Después de la espera, el chatbot responde una vez con la lista de cafés y su
+   precio ($9.990 para Ana).
+2. Toca el café que quieras en la lista y dile cuánto: `quiero 2 bolsas`.
+3. Si el chatbot pide tu dirección de despacho, toca «📍 Compartir ubicación».
+4. Llega el **resumen** con el despacho de Ñuñoa, el total ($23.970) y los botones «Confirmar» y «Cambiar
+   algo». Toca **Confirmar**: llega el botón «Pagar» (es de mentira).
+5. Toca «💳 Simular pago»: Khipu «confirma» y llega el aviso de pago recibido.
+6. Mira el **gasto del modelo** a la derecha: subió una llamada por cada respuesta que escribió el modelo.
+   Confirmar y pagar no usaron el modelo.
+7. Escribe `quiero hablar con una persona`. A la derecha aparece el **aviso al equipo** y la conversación en
+   la **bandeja**, destacada y con el motivo; el chatbot deja de responder ahí. Escribe tu nombre arriba del
+   panel, responde a Ana desde la bandeja (lo ves llegar a su teléfono) y, cuando termines, toca
+   **Resolver**: el próximo mensaje de Ana lo vuelve a atender el chatbot.
 
-   ```
-   hola buenas
-   quiero café para Ñuñoa
-   ¿qué futaleufú tienen?
-   ```
+Cambia a **Emporio Dos Hermanos** arriba del teléfono para ver los precios mayoristas.
 
-   Después de la espera, el chatbot responde una vez, con la lista de cafés y su precio:
+Para cambiar un precio, una zona o una pregunta de ejemplo, edita `local/semilla/datos.ts` y vuelve a correr
+`pnpm semilla`; en producción se editan los archivos de `definiciones/` y se corre `pnpm cargar`.
 
-   ```
-   … El chatbot espera a que termines de escribir
-   … El chatbot está escribiendo
-   Chatbot: ¡Hola, Ana! Estos son nuestros Futaleufú:
-     1) Futaleufú — 150 gramos … · $9.990 · Futaleufú — 150 gramos / Grano entero
-     2) Futaleufú — 150 gramos … · $9.990 · Futaleufú — 150 gramos / Molido
-   ```
-
-2. Elige de la lista con un número, por ejemplo `2`, y dile cuánto quieres: `quiero 2 bolsas`.
-3. Si el chatbot pide tu dirección de despacho, escribe `/ubicacion`.
-4. El chatbot manda el **resumen** con el despacho de Ñuñoa y el total, y los botones:
-
-   ```
-   Total: $23.970
-   ¿Lo dejamos así?
-     1) Confirmar
-     2) Cambiar algo
-   ```
-
-   Escribe `1` para **Confirmar**. Llega el botón «Pagar» con su enlace (es de mentira: no lo abras).
-5. Escribe `/pagar`. Khipu «confirma» el pago y llega el aviso de pago recibido:
-
-   ```
-   (Khipu confirmó el pago khipu-e2e-1)
-   Chatbot (plantilla payment_received): Ana Pérez · $23.970
-   ```
-
-6. Prueba también pedir una persona: `quiero hablar con una persona`. Verás el **aviso al equipo** y el
-   chatbot deja de responder en esa conversación hasta que alguien la retome.
-7. `/salir` para terminar.
-
-**Atender como el equipo**: abre una tercera terminal en la misma carpeta y corre `pnpm bandeja`. Ahí ves las
-conversaciones que esperan a una persona, con su motivo:
+**Desde la terminal** (opcional, lo mismo sin navegador): en otra terminal, `pnpm conversar` para escribir
+como Ana (`--cliente mayorista` para Emporio; botones y listas se eligen con el número, `/ubicacion`,
+`/pagar`, `/ayuda` y `/salir`), y `pnpm bandeja` para atender como el equipo:
 
 ```bash
 pnpm bandeja                                    # las que esperan a una persona
 pnpm bandeja ver 56911112222                    # el hilo de Ana
 pnpm bandeja responder 56911112222 --como Rodo Hola Ana, te ayudo yo
-pnpm bandeja reanudar 56911112222               # el chatbot vuelve a atender
+pnpm bandeja resolver 56911112222               # la cierra: el chatbot vuelve a atender a Ana
 ```
-
-Tu respuesta aparece en `pnpm conversar`, como le llegaría a Ana por WhatsApp. Para cambiar un precio, una
-zona o una pregunta de ejemplo, edita `local/semilla/datos.ts` y vuelve a correr `pnpm semilla`; en
-producción se editan los archivos de `definiciones/` y se corre `pnpm cargar`.
 
 ## 7. Problemas comunes
 
 **«El puerto 8092 está ocupado (¿quedó abierto otro pnpm local?)»** (o el 8093). Seguramente tienes otro
 `pnpm local` abierto en otra terminal: ciérralo con `Ctrl+C`. Si el puerto lo usa otro programa, elige otro
-en `.env`: `CAFE_PUERTO=8100` o `CAFE_DOBLES_PUERTO=8101`.
+en `.env`: `CAFE_PUERTO=8100` o `CAFE_DOBLES_PUERTO=8101` (el simulador queda en ese puerto:
+http://localhost:8101/).
 `pnpm conversar` lee los mismos valores de `.env`.
 
 **«No pude conectarme a PostgreSQL en 127.0.0.1:5433 … ¿Está arriba la base?»** Docker Desktop está cerrado
@@ -264,8 +240,8 @@ parece de desarrollo», revisa que en `.env` esté
 `DATABASE_URL=postgresql://cafe:cafe@127.0.0.1:5433/cafe_dev` (o el puerto de tu PostgreSQL). Si dice
 «CAFE_ENV=produccion», cambia esa línea a `CAFE_ENV=desarrollo`.
 
-**«No encuentro el modo local en http://127.0.0.1:8092»** al correr `pnpm conversar`. Primero tiene que
-estar corriendo `pnpm local` en otra terminal.
+**El simulador no carga, o `pnpm conversar` dice «No encuentro el modo local…».** Primero tiene que estar
+corriendo `pnpm local` (y su terminal, abierta).
 
 **El chatbot responde «Le dejé tu mensaje al equipo…» y no te atiende.** No te reconoce como cliente: falta la
 semilla. Corre `pnpm semilla` con la base arriba y vuelve a escribir.
@@ -287,11 +263,49 @@ El proyecto está preparado para que lo sigas mejorando con Claude Code, sin esc
    ```
 
    Tiene que terminar sin errores. Si el cambio toca una conversación, pídele además las pruebas
-   de punta a punta. Luego pruébalo tú mismo con `pnpm local`, `pnpm conversar` y `pnpm bandeja`, como en el paso 6.
+   de punta a punta. Luego pruébalo tú mismo con `pnpm local` y el simulador, como en el paso 6.
 
 Hay cosas que Claude no va a hacer aunque se lo pidas, porque protegen el negocio: el precio siempre sale del
 catálogo (nunca lo inventa el modelo), se respeta el consentimiento de cada cliente, y nunca se usan claves
 reales ni la base de producción en las pruebas.
+
+## 9. Proveedor del modelo y costos
+
+**Qué consume tokens.** Solo las respuestas que escribe el modelo. El chatbot espera a que el cliente termine
+de escribir y hace **una llamada al modelo por cada tanda de mensajes**, no una por mensaje. No usan el modelo:
+tocar «Confirmar», pagar, pedir una persona (pasa directo a la encargada), los avisos al equipo ni nada de lo
+que hace `pnpm bandeja`. La base de datos y los simuladores de WhatsApp y Khipu no cuestan nada.
+
+**Cuánto cuesta.** Cada llamada manda las reglas del chatbot, el catálogo sin montos, las preguntas frecuentes
+y los últimos intercambios: unos pocos miles de tokens de entrada (una parte se repite y el proveedor la cobra
+más barata, «cacheada») y unos cientos de salida. Con los precios típicos de un modelo mediano, una
+conversación de prueba completa cuesta **unos pocos centavos de dólar**; revisa la tarifa vigente de tu
+modelo en la página de precios del proveedor. En el simulador (punto 5) ves las llamadas, los tokens y el
+gasto del mes mientras pruebas.
+
+**Qué proveedor conectar.** Por defecto, **OpenAI** (punto 1). Sirve cualquier proveedor **compatible con la
+API de OpenAI** (`/chat/completions` con llamadas a funciones), por ejemplo OpenRouter, Groq o Together. Se
+cambia en `.env` con tres líneas:
+
+```bash
+OPENAI_API_KEY=la-clave-de-ese-proveedor        # se llama así aunque el proveedor sea otro
+CAFE_MODELO_BASE_URL=https://openrouter.ai/api/v1   # la dirección que indica el proveedor
+CAFE_MODELO=nombre-del-modelo                    # tal como lo escribe el proveedor
+```
+
+El modelo tiene que saber **llamar funciones** (function calling / tools): el chatbot le pide su decisión de
+esa forma. Si con otro modelo las respuestas salen raras o todo pasa a la encargada, vuelve al de OpenAI.
+
+**Cómo controlar el gasto.** Tres capas, de afuera hacia adentro:
+
+1. **En el proveedor**: un tope mensual (en OpenAI, **Limits**). Es la red de seguridad final.
+2. **En el chatbot**: `CAFE_LIMITE_GASTO_USD_MES` (50 dólares por defecto). El equipo recibe un aviso al 50,
+   80 y 100 %; al 100 % el chatbot deja de usar el modelo y pasa los mensajes a la encargada hasta el mes
+   siguiente.
+3. **La tarifa** `CAFE_MODELO_TARIFA_USD_POR_MTOK=entrada,cacheada,salida`: los dólares por millón de tokens
+   de tu modelo, copiados de la página de precios del proveedor (por ejemplo `1.25,0.125,10`). **Sin tarifa el
+   chatbot cuenta tokens pero no dólares**, así que el límite del punto 2 no puede cortar. En producción es
+   obligatoria; en local es opcional, pero ponla si quieres ver el gasto en dólares en el simulador.
 
 ## Nota: publicar en producción
 

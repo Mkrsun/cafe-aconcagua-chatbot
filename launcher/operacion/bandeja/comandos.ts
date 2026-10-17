@@ -24,8 +24,8 @@ export const AYUDA = [
   "pnpm bandeja responder <id|teléfono> --como <nombre> <texto>",
   "pnpm bandeja tomar <id|teléfono> --como <nombre>",
   "pnpm bandeja pausar <id|teléfono> [motivo]",
-  "pnpm bandeja reanudar <id|teléfono>   el chatbot vuelve a atender",
-  "pnpm bandeja resolver <id|teléfono>   cierra la conversación",
+  "pnpm bandeja reanudar <id|teléfono>   quita la pausa (si nadie la tomó, sigue el chatbot)",
+  "pnpm bandeja resolver <id|teléfono>   la cierra: el chatbot atiende el próximo mensaje",
 ];
 
 /** Saca `--como <nombre>` de los argumentos: quién del equipo actúa. */

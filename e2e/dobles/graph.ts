@@ -20,6 +20,8 @@ export interface MensajeEnviado {
   readonly plantilla?: string;
   /** Las variables de la plantilla en orden ({{1}}, {{2}}…). */
   readonly parametros?: readonly string[];
+  /** Cuándo llegó al doble (ISO): ordena el hilo del simulador. */
+  readonly en: string;
 }
 
 interface CuerpoDeEnvio {
@@ -85,5 +87,6 @@ function enviado(id: string, c: CuerpoDeEnvio): MensajeEnviado {
     ...(c.interactive ? { interactivo: c.interactive } : {}),
     ...(c.template?.name ? { plantilla: c.template.name } : {}),
     ...(parametros ? { parametros } : {}),
+    en: new Date().toISOString(),
   };
 }

@@ -3,7 +3,7 @@ import type { MensajeEnviado } from "../../e2e/dobles/graph.js";
 import { mostrarMensaje } from "./mostrar.js";
 
 const ANA = "56911112222";
-const base = { id: "wamid.1", para: ANA };
+const base = { id: "wamid.1", para: ANA, en: "2026-10-16T12:00:00.000Z" };
 
 describe("cómo la CLI muestra lo que el chatbot responde", () => {
   it("un texto se muestra tal cual y no deja opciones", () => {
