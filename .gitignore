@@ -1,0 +1,11 @@
+node_modules/
+.DS_Store
+# Secretos y configuración local: nunca al repositorio (el `.env.example` sí).
+.env
+.env.*
+!.env.example
+.data/
+dist/
+coverage/
+# Resultados de Playwright
+e2e/.resultados/
