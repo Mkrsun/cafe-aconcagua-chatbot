@@ -108,7 +108,8 @@ resumen:
    derecha atiendes como el equipo (bandeja, avisos) y ves el gasto del modelo. También se puede desde la
    terminal con `pnpm conversar` y `pnpm bandeja`.
 
-**Publicar en producción queda a cargo de Café**: el hosting (un servidor con PostgreSQL 16 y una dirección
+**Publicar en producción**: la guía paso a paso (VPS de Contabo, dominio, WhatsApp, Khipu, respaldos) está en
+`docs/manual-produccion.md`. Queda a cargo de Café: el hosting (un servidor con PostgreSQL 16 y una dirección
 pública con HTTPS), el número real de WhatsApp en la app de Meta con sus plantillas aprobadas, y la cuenta real
 de Khipu. Lo que hay que configurar está en la sección siguiente.
 

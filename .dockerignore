@@ -1,0 +1,10 @@
+node_modules
+.git
+.env
+.env.*
+deploy/produccion.env
+deploy/respaldos
+e2e/.resultados
+coverage
+dist
+deploy/clientes

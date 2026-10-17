@@ -312,4 +312,5 @@ esa forma. Si con otro modelo las respuestas salen raras o todo pasa a la encarg
 Esta guía es para probar en tu computador. Publicarlo para clientes reales queda a cargo de Café: el
 hosting (un servidor con PostgreSQL 16 y una dirección pública con HTTPS), el número real de WhatsApp en la
 app de Meta con sus plantillas aprobadas, y la cuenta real de Khipu. Lo que hay que configurar está en
-`docs/entrega.md`, en «Qué se configura».
+`docs/entrega.md`, en «Qué se configura», y la guía paso a paso para un VPS de Contabo, en
+`docs/manual-produccion.md`.

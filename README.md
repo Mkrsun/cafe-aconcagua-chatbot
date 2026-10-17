@@ -121,7 +121,12 @@ plantillas aprobadas.
 
 ## Levantarlo
 
-Requisitos: Node 24, pnpm 10 y, para producción, PostgreSQL 16.
+**En un servidor (producción)**: la guía paso a paso, para quien nunca administró uno, está en
+[`docs/manual-produccion.md`](docs/manual-produccion.md): un VPS de Contabo con Docker, HTTPS automático y el
+comando `./deploy/cafe` (arrancar, cargar, clientes, bandeja, logs, respaldo, actualizar). La configuración
+real va en `deploy/produccion.env`, a partir de `deploy/produccion.env.example`.
+
+**Sin Docker**, en cualquier máquina. Requisitos: Node 24, pnpm 10 y, para producción, PostgreSQL 16.
 
 ```bash
 pnpm install

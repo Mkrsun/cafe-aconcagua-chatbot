@@ -1,0 +1,11 @@
+# Caddy pide y renueva solo el certificado HTTPS del dominio. Al chatbot solo llegan /salud y los
+# webhooks de WhatsApp y Khipu: el resto responde 404.
+{$CAFE_DOMINIO} {
+	@chatbot path /salud /webhooks/whatsapp /payments/khipu/webhook
+	handle @chatbot {
+		reverse_proxy app:8092
+	}
+	handle {
+		respond "Café Aconcagua" 404
+	}
+}

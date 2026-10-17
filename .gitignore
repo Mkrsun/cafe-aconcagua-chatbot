@@ -4,6 +4,12 @@ node_modules/
 .env
 .env.*
 !.env.example
+# Producción: la configuración real, los clientes y los respaldos viven solo en el VPS.
+deploy/produccion.env
+deploy/clientes/*
+!deploy/clientes/LEEME.md
+deploy/respaldos/
+deploy/respaldos.log
 .data/
 dist/
 coverage/

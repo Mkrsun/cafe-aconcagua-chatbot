@@ -50,6 +50,7 @@ Si es tu primera vez aquí, lee `README.md` y `SETUP.md` (cómo levantarlo y pro
 | `launcher/` | Raíz de composición, configuración por entorno y los ejecutables: `main.ts` (servidor), `cargar.ts` y `bandeja.ts` (comandos del equipo) |
 | `e2e/` | Playwright: `smoke` y `critical` sin navegador y `simulador` en Chromium, con el servidor real, una base `cafe_test_e2e_*` por prueba y dobles HTTP (`e2e/dobles`) |
 | `local/` | Probar en local: `semilla` (datos de ejemplo), `modo-local` (servidor real con WhatsApp y Khipu dobles), `simulador` (página web solo local: teléfono del cliente, bandeja y gasto) y `conversar` (CLI del cliente). Como `e2e/`, fuera de `pnpm arquitectura` |
+| `deploy/` | Producción en un VPS: `docker-compose.yml` (base, chatbot y Caddy con HTTPS), `produccion.env.example` y el comando `./deploy/cafe`. Guía: `docs/manual-produccion.md` |
 | `migrations/` | SQL de PostgreSQL (esquema `cafe`), numeradas e idempotentes |
 
 Una feature importa a otra solo por su `index.ts`, sus `puertos/` o su `dominio/`.
