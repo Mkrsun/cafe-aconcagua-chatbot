@@ -20,7 +20,8 @@ export interface DepsDesconocido {
 
 /**
  * Un número que no está en el CRM: un acuse cordial cada 24 h y un aviso al equipo;
- * sin inferir ni cotizar. La marca se escribe solo si el acuse salió.
+ * sin inferir ni cotizar. El acuse promete que el equipo lo sabe solo si el aviso salió, y la
+ * marca se escribe solo si salieron el aviso y el acuse.
  */
 export class ResponderDesconocido {
   constructor(private readonly deps: DepsDesconocido) {}
@@ -34,7 +35,7 @@ export class ResponderDesconocido {
       const previo = await this.deps.registros.leer<{ at: string }>(clave);
       if (previo && ahora.getTime() - Date.parse(previo.at) < VENTANA_MS)
         return;
-      await this.deps.aviso.notificar({
+      const avisado = await this.deps.aviso.notificar({
         tipo: "desconocido",
         cliente: digitos,
         motivo: "Un número que no está en el CRM escribió al chatbot",
@@ -43,9 +44,10 @@ export class ResponderDesconocido {
       });
       const envio = await this.deps.canal.enviar({
         telefono: evento.telefono,
-        texto: TEXTOS.desconocido,
+        texto: avisado ? TEXTOS.desconocido : TEXTOS.desconocidoSinAviso,
       });
-      if (envio.enviado)
+      // Sin aviso no se marca: el próximo mensaje vuelve a intentar avisar al equipo.
+      if (avisado && envio.enviado)
         await this.deps.registros.guardar(clave, { at: ahora.toISOString() });
     });
   }

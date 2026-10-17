@@ -80,6 +80,23 @@ describe("conciliar un pago de Khipu", () => {
     });
   });
 
+  it("un cobro vencido o rechazado se descarta y el siguiente crea otro enlace", async () => {
+    const m = mundo();
+    await m.registrar.ejecutar(pedidoDePrueba());
+    const primero = await m.cobrar.ejecutar("ped_1");
+    m.khipu.terminar("khipu_1", "vencido");
+    expect(await m.conciliar.ejecutar("khipu_1")).toEqual({
+      confirmado: false,
+    });
+    expect((await m.pedidos.pagosDe("ped_1"))[0]).toMatchObject({
+      estado: "rechazado",
+    });
+    const segundo = await m.cobrar.ejecutar("ped_1");
+    expect(segundo?.url).not.toBe(primero?.url);
+    expect(segundo?.url).toContain("khipu_2");
+    expect(m.pagados).toEqual([]);
+  });
+
   it("un monto distinto o un pago desconocido no tienen efecto", async () => {
     const m = mundo();
     await m.registrar.ejecutar(pedidoDePrueba());

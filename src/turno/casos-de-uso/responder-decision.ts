@@ -30,8 +30,12 @@ function hechos(
   tarifaDespacho?: Parameters<typeof cotizarDespacho>[0],
 ) {
   const { propuesta, pedido } = t.estado;
-  const despacho =
-    tarifaDespacho && cotizarDespacho(tarifaDespacho, propuesta?.total ?? 0);
+  // Lo gratis se decide por los productos: el total ya trae el despacho cobrado.
+  const productos = (propuesta?.lineas ?? []).reduce(
+    (s, l) => s + l.subtotal,
+    0,
+  );
+  const despacho = tarifaDespacho && cotizarDespacho(tarifaDespacho, productos);
   const conHechos = texto
     .replaceAll("{{resumen}}", propuesta ? textoDelResumen(propuesta) : "")
     .replaceAll(
@@ -47,11 +51,23 @@ function hechos(
   return renderizarPrecios(conHechos, precios).texto.trim();
 }
 
+/** El enlace vigente del pedido: si el cobro venció o se rechazó, el cobro crea uno nuevo. */
+async function refrescarEnlace(t: TurnoEnCurso, texto: string) {
+  const pedido = t.estado.pedido;
+  if (!pedido || !texto.includes("{{pago}}")) return;
+  const enlace = await t.deps.cobrar(pedido.id);
+  t.estado = {
+    ...t.estado,
+    pedido: { id: pedido.id, ...(enlace ? { url: enlace.url } : {}) },
+  };
+}
+
 /** Ejecuta la decisión del modelo. */
 export async function ejecutarDecision(
   t: TurnoEnCurso,
   d: DecisionDelTurno,
 ): Promise<ResultadoDelTurno> {
+  await refrescarEnlace(t, d.response);
   t.estado = conRefs(
     t.estado,
     d.knownRefs,

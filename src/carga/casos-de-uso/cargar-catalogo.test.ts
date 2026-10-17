@@ -76,6 +76,28 @@ describe("cargar el catálogo", () => {
     ]);
   });
 
+  it("un cambio de familia o de su nombre se aplica, con los precios definidos", async () => {
+    const catalogo = new CatalogoEnMemoria();
+    await cargarCatalogo(catalogo, [molido], resumenVacio());
+    const r = resumenVacio();
+    const otraFamilia = {
+      ...molido,
+      familia: "futaleufu-especial",
+      familiaNombre: "Futaleufú Especial",
+    };
+    await cargarCatalogo(catalogo, [otraFamilia], r);
+    const [formato] = await catalogo.listar();
+    expect(formato).toMatchObject({
+      familia: "futaleufu-especial",
+      familiaNombre: "Futaleufú Especial",
+    });
+    expect(formato?.precios.map((p) => p.montoClp)).toEqual([9990, undefined]);
+    expect(r.cambios).toEqual([
+      "formato 0028 cambió de familia",
+      "precio minorista de 0028: $9.990",
+    ]);
+  });
+
   it("archiva lo que ya no está en las definiciones", async () => {
     const catalogo = new CatalogoEnMemoria();
     await cargarCatalogo(catalogo, [molido, grano], resumenVacio());

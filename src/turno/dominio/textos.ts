@@ -17,6 +17,10 @@ export const TEXTOS = {
   desconocido:
     "¡Hola! Gracias por escribir a Café Aconcagua. Le dejé tu mensaje al equipo y te " +
     "responden por aquí apenas puedan.",
+  /** Si el aviso al equipo no salió: no se promete nada que nadie va a cumplir. */
+  desconocidoSinAviso:
+    "¡Hola! Gracias por escribir a Café Aconcagua. En este momento no pude dejarle tu mensaje " +
+    "al equipo: por favor vuelve a escribirnos en un rato.",
 } as const;
 
 export const pedidoRegistrado = (url: string) =>

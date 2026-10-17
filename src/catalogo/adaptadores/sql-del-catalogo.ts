@@ -14,7 +14,9 @@ export const SQL = {
   listar: `${FORMATOS} WHERE f.archivado_en IS NULL ${AGRUPAR} ORDER BY f.creado_en, f.sku`,
   uno: `${FORMATOS} WHERE f.sku = $1 ${AGRUPAR}`,
   crearFamilia: `
-    INSERT INTO cafe.familias (id, nombre) VALUES ($1, $2) ON CONFLICT (id) DO NOTHING`,
+    INSERT INTO cafe.familias (id, nombre) VALUES ($1, $2)
+    ON CONFLICT (id) DO UPDATE SET nombre = EXCLUDED.nombre, actualizada_en = now()
+    WHERE cafe.familias.nombre <> EXCLUDED.nombre`,
   crearFormato: `
     INSERT INTO cafe.formatos (sku, familia_id, nombre, gramaje, disponible)
     VALUES ($1, $2, $3, $4, $5)`,

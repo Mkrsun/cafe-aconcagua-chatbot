@@ -12,7 +12,8 @@ export interface DepsConciliarPago {
 
 /**
  * Concilia un aviso de Khipu: nunca cree el cuerpo; consulta a Khipu y solo vale si
- * está pagado, es de ese pedido y por el monto registrado. Repetido, no vuelve a avisar.
+ * está pagado, es de ese pedido y por el monto registrado. Repetido, no vuelve a avisar. Un
+ * cobro vencido o rechazado queda descartado: el próximo cobro crea un enlace nuevo.
  */
 export class ConciliarPago {
   constructor(private readonly deps: DepsConciliarPago) {}
@@ -23,6 +24,11 @@ export class ConciliarPago {
     if (!pago) return { confirmado: false };
     if (pago.estado === "verificado") return { confirmado: true };
     const consulta = await proveedor.consultar(idDelProveedor);
+    if (consulta.estado === "rechazado" || consulta.estado === "vencido") {
+      // Sin esto el cobro seguiría «pendiente» y el cliente recibiría siempre el enlace muerto.
+      await pedidos.guardarPago({ ...pago, estado: "rechazado" });
+      return { confirmado: false };
+    }
     const valido =
       consulta.estado === "pagado" &&
       consulta.referencia === pago.pedidoId &&

@@ -146,6 +146,18 @@ export function contratoDelCatalogo(crear: () => Promise<ICatalogoEditable>) {
       await expect(catalogo.crear(nuevo, "Rodo")).rejects.toThrow(Conflicto);
     });
 
+    it("crear con el nombre nuevo de una familia lo deja vigente para esa familia", async () => {
+      const catalogo = await crear();
+      const f = await catalogo.crear(nuevo, "Rodo");
+      await catalogo.archivar(f.sku, f.revision, "Rodo");
+      await catalogo.crear(
+        { ...nuevo, familiaNombre: "Futaleufú Especial" },
+        "Rodo",
+      );
+      const [vigente] = await catalogo.listar();
+      expect(vigente?.familiaNombre).toBe("Futaleufú Especial");
+    });
+
     it("archivar audita el formato como estaba", async () => {
       const catalogo = await crear();
       const formato = await catalogo.crear(nuevo, "Rodo");

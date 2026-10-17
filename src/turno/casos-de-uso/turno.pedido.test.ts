@@ -45,6 +45,21 @@ describe("el turno: del resumen al pago", () => {
     expect((await m.pedidos.obtener(pedido!.id))?.version?.total).toBe(19980);
   });
 
+  it("si el cobro venció, {{pago}} manda un enlace nuevo y no el muerto", async () => {
+    const m = await mundoDelTurno([
+      proponer(),
+      decision({ response: "Claro, aquí tienes: {{pago}}" }),
+    ]);
+    await m.atender("quiero 2 futaleufú molido");
+    await m.atender("sipo");
+    const [pedido] = await m.pedidos.listar({});
+    const [pago] = await m.pedidos.pagosDe(pedido!.id);
+    await m.pedidos.guardarPago({ ...pago!, estado: "rechazado" });
+    const r = await m.atender("¿me mandas de nuevo el link?");
+    expect(r.texto).toContain("https://khipu.com/payment/info/khipu_2");
+    expect(r.texto).not.toContain("khipu_1");
+  });
+
   it("el botón «Cambiar algo» retira la propuesta y pregunta qué cambiar", async () => {
     const m = await mundoDelTurno([proponer()]);
     await m.atender("quiero 2");
@@ -67,6 +82,17 @@ describe("el turno: del resumen al pago", () => {
     expect((await m.atender("mejor 6")).texto).toContain(
       "Despacho a Santiago oriente: gratis por ser un pedido desde $50.000",
     );
+  });
+
+  it("{{despacho}} decide lo gratis por los productos, no por el total con despacho", async () => {
+    const m = await mundoDelTurno([
+      proponer({ changes: [{ sku: "0028", cantidad: 5 }], despacho: "Ñuñoa" }),
+      decision({ response: "El despacho: {{despacho}}" }),
+    ]);
+    expect((await m.atender("5 a Ñuñoa")).texto).toContain("Total: $53.940");
+    const r = await m.atender("¿y cuánto es el despacho?");
+    expect(r.texto).toContain("cuesta $3.990");
+    expect(r.texto).not.toContain("cuesta $0");
   });
 
   it("una zona sin tarifa o un precio pendiente pasan a la encargada como consulta", async () => {

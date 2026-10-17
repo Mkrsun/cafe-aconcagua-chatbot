@@ -15,6 +15,16 @@ export interface Violacion {
 }
 
 const MONTO = /\$\s?\d|\(monto\)|\b\d[\d.]*\s?(?:pesos|clp|lucas?|lukas?)\b/i;
+/** Miles con punto a la chilena («9.990»), salvo que sea un peso o volumen («1.000 gramos»). */
+const MONTO_CON_MILES =
+  /\b\d{1,3}(?:\.\d{3})+\b(?!\s?(?:g|grs?|gramos|kg|kilos?|ml)\b)/i;
+/** Una cifra sin formato después de un verbo de precio («cuesta 9990»). */
+const MONTO_CON_VERBO =
+  /\b(?:sale|salen|cuesta|cuestan|vale|valen|precio|total|son)\s+(?:de\s+|en\s+|a\s+)?\d{4,}\b/i;
+const escribeMonto = (texto: string) =>
+  [MONTO, MONTO_CON_MILES, MONTO_CON_VERBO].some((patron) =>
+    patron.test(texto),
+  );
 const ESTADO = new RegExp(
   [
     "\\b(?:tu|el|su) pedido (?:ya )?(?:quedo|esta|fue|va)\\s+" +
@@ -38,7 +48,7 @@ export function violaciones(
   const encontradas: Violacion[] = [];
   const agregar = (codigo: CodigoDeViolacion, detalle: string) =>
     encontradas.push({ codigo, detalle });
-  if (MONTO.test(texto))
+  if (escribeMonto(texto))
     agregar(
       "monto_escrito",
       "nunca escribas montos: usa {{precio:SKU}} o {{precios:FAMILIA}}",

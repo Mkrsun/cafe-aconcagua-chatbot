@@ -21,6 +21,9 @@ const validar = (definidos: readonly FormatoDefinido[]) =>
 
 type Validado = ReturnType<typeof validar>[number];
 
+const mismaFamilia = (actual: FormatoEditable, d: Validado["formato"]) =>
+  actual.familia === d.familia && actual.familiaNombre === d.familiaNombre;
+
 const mismoFormato = (actual: FormatoEditable, d: Validado["formato"]) =>
   actual.nombre === d.nombre &&
   (actual.gramaje ?? "") === (d.gramaje ?? "") &&
@@ -57,6 +60,11 @@ async function cargarFormato(
   if (!actual) {
     actual = await catalogo.crear(formato, ACTOR_DE_LA_CARGA);
     r.cambios.push(`formato ${formato.sku} creado`);
+  } else if (!mismaFamilia(actual, formato)) {
+    // La familia no se edita: se archiva y se restaura con la nueva (los precios se fijan abajo).
+    await catalogo.archivar(formato.sku, actual.revision, ACTOR_DE_LA_CARGA);
+    actual = await catalogo.crear(formato, ACTOR_DE_LA_CARGA);
+    r.cambios.push(`formato ${formato.sku} cambió de familia`);
   } else if (!mismoFormato(actual, formato)) {
     const { nombre, disponible } = formato;
     const cambio = { nombre, disponible, gramaje: formato.gramaje };

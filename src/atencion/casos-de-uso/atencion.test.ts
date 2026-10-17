@@ -117,6 +117,24 @@ describe("atender WhatsApp con espera humana", () => {
     expect(m.canal.a(EQUIPO)).toHaveLength(1);
     expect(m.modelo.llamadas).toHaveLength(0);
   });
+
+  it("si el aviso al equipo no sale, al desconocido no se le promete y se reintenta", async () => {
+    const m = mundoDeAtencion(responde("no debería"));
+    m.canal.fallar = (x) =>
+      x.telefono === EQUIPO
+        ? { enviado: false, error: "Meta lo rechazó" }
+        : undefined;
+    await m.recibir.ejecutar([m.texto("hola, ¿venden café?", "56977778888")]);
+    const [acuse] = m.canal.a("56977778888");
+    expect(acuse?.texto).not.toContain("Le dejé tu mensaje al equipo");
+    expect(acuse?.texto).toContain("vuelve a escribirnos");
+    m.canal.fallar = () => undefined;
+    await m.recibir.ejecutar([m.texto("¿hola?", "56977778888")]);
+    expect(m.canal.a(EQUIPO)).toHaveLength(1);
+    expect(m.canal.a("56977778888").at(-1)?.texto).toContain(
+      "Le dejé tu mensaje al equipo",
+    );
+  });
 });
 
 describe("derivación y reclamos en el canal", () => {

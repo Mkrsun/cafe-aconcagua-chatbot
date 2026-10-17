@@ -8,7 +8,7 @@ import type {
 export class KhipuFalso implements IProveedorDePago {
   private readonly cobros = new Map<
     string,
-    SolicitudDeCobro & { pagado: boolean }
+    SolicitudDeCobro & { estado: ConsultaDePago["estado"] }
   >();
   fallarAlCrear = false;
 
@@ -16,15 +16,15 @@ export class KhipuFalso implements IProveedorDePago {
     if (this.fallarAlCrear)
       throw new Error("khipu: HTTP 503 al crear el cobro");
     const id = `khipu_${this.cobros.size + 1}`;
-    this.cobros.set(id, { ...s, pagado: false });
+    this.cobros.set(id, { ...s, estado: "pendiente" });
     return { id, url: `https://khipu.com/payment/info/${id}` };
   }
 
   async consultar(id: string): Promise<ConsultaDePago> {
     const cobro = this.cobros.get(id);
-    if (!cobro?.pagado) return { estado: "pendiente" };
+    if (!cobro || cobro.estado === "pendiente") return { estado: "pendiente" };
     return {
-      estado: "pagado",
+      estado: cobro.estado,
       montoClp: cobro.montoClp,
       referencia: cobro.referencia,
     };
@@ -36,9 +36,15 @@ export class KhipuFalso implements IProveedorDePago {
     if (cobro)
       this.cobros.set(id, {
         ...cobro,
-        pagado: true,
+        estado: "pagado",
         montoClp: montoClp ?? cobro.montoClp,
       });
+  }
+
+  /** El cobro venció o el banco lo rechazó: ya no se puede pagar. */
+  terminar(id: string, estado: "rechazado" | "vencido") {
+    const cobro = this.cobros.get(id);
+    if (cobro) this.cobros.set(id, { ...cobro, estado });
   }
 
   ultimoId() {
