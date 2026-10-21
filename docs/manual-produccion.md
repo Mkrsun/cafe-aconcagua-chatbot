@@ -165,7 +165,8 @@ Si no arranca: `./deploy/cafe logs` muestra el motivo (casi siempre una variable
 
 ## 8. Cargar el catálogo y los clientes
 
-**Catálogo, precios, despacho y preguntas frecuentes** viven en `definiciones/` (ver `README.md`). Lo ideal es
+**Catálogo, precios, despacho, preguntas frecuentes y notas de cata** viven en `definiciones/` (ver
+`README.md`). Lo ideal es
 editarlos en GitHub (o con Claude Code) y luego, en el servidor:
 
 ```bash

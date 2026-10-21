@@ -264,6 +264,18 @@ El proyecto está preparado para que lo sigas mejorando con Claude Code, sin esc
 
    Tiene que terminar sin errores. Si el cambio toca una conversación, pídele además las pruebas
    de punta a punta. Luego pruébalo tú mismo con `pnpm local` y el simulador, como en el paso 6.
+4. Si el cambio toca cómo habla el chatbot (su voz, sus reglas, el modelo o el esfuerzo), pídele que lo mida
+   con el banco de conversaciones, antes y después:
+
+   ```bash
+   pnpm banco
+   ```
+
+   Usa el modelo real (gasta tokens de tu cuenta) y deja un informe en la carpeta `.banco/` con cada
+   conversación tal como la leería el cliente.
+
+Para tomar el proyecto desde cero con otra cuenta (qué está hecho, qué PRs faltan por integrar y qué falta
+para publicar), lee `docs/traspaso.md`.
 
 Hay cosas que Claude no va a hacer aunque se lo pidas, porque protegen el negocio: el precio siempre sale del
 catálogo (nunca lo inventa el modelo), se respeta el consentimiento de cada cliente, y nunca se usan claves
@@ -276,8 +288,8 @@ de escribir y hace **una llamada al modelo por cada tanda de mensajes**, no una 
 tocar «Confirmar», pagar, pedir una persona (pasa directo a la encargada), los avisos al equipo ni nada de lo
 que hace `pnpm bandeja`. La base de datos y los simuladores de WhatsApp y Khipu no cuestan nada.
 
-**Cuánto cuesta.** Cada llamada manda las reglas del chatbot, el catálogo sin montos, las preguntas frecuentes
-y los últimos intercambios: unos pocos miles de tokens de entrada (una parte se repite y el proveedor la cobra
+**Cuánto cuesta.** Cada llamada manda las reglas del chatbot, el catálogo sin montos, las notas de cata, las
+preguntas frecuentes, el recuerdo del cliente y los últimos intercambios: unos pocos miles de tokens de entrada (una parte se repite y el proveedor la cobra
 más barata, «cacheada») y unos cientos de salida. Con los precios típicos de un modelo mediano, una
 conversación de prueba completa cuesta **unos pocos centavos de dólar**; revisa la tarifa vigente de tu
 modelo en la página de precios del proveedor. En el simulador (punto 5) ves las llamadas, los tokens y el
@@ -296,6 +308,12 @@ CAFE_MODELO_API=chat                             # con OpenAI se deja en respons
 
 El modelo tiene que saber **llamar funciones** (function calling / tools): el chatbot le pide su decisión de
 esa forma. Si con otro modelo las respuestas salen raras o todo pasa a la encargada, vuelve al de OpenAI.
+
+**Razonamiento.** `CAFE_MODELO_ESFUERZO` (`none`, `low`, `medium` o `high`) decide cuánto piensa el modelo
+antes de responder. Viene en `medium`: en el banco de conversaciones fue el único nivel sin errores (con `low`
+llegó a nombrar un café y armar el pedido con otro) y `high` gasta bastante más sin mejorar. Con OpenAI el
+razonamiento necesita `CAFE_MODELO_API=responses` (el valor por defecto); por `/chat/completions`, algunos
+modelos solo aceptan `none`. Si lo cambias, mídelo con `pnpm banco`.
 
 **Cómo controlar el gasto.** Tres capas, de afuera hacia adentro:
 
