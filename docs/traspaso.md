@@ -92,7 +92,9 @@ gh pr edit 2 --base main
 gh pr merge 2 --merge
 ```
 
-y lo mismo con el 3, el 4… hasta el 8. O pídeselo a Claude: «integra los PRs del #1 al #8 en orden, cada
+y lo mismo con el 3, el 4… hasta el 8. El CI de GitHub (`verify` y las tres suites de punta a punta) corre
+solo cuando el PR apunta a `main`: después del `gh pr edit`, espera a que `gh pr checks 2` quede en verde
+antes de integrar. O pídeselo a Claude: «integra los PRs del #1 al #8 en orden, cada
 uno a main, revisando que el CI quede en verde». Si alguno queda con conflictos, pídele que traiga lo último
 de `main` a esa rama y los resuelva.
 
