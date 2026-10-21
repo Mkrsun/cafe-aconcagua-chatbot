@@ -31,6 +31,8 @@ export interface DecisionDelTurno {
     readonly skus: readonly string[];
   };
   readonly response: string;
+  /** Hechos del cliente que sirven en otra conversación (su método, su local); vacío si nada. */
+  readonly recordar: readonly string[];
 }
 
 export const HERRAMIENTA = {
@@ -55,6 +57,7 @@ export const ESQUEMA_DE_DECISION = {
     "despacho",
     "forma",
     "response",
+    "recordar",
   ],
   properties: {
     intent: { type: "string", enum: INTENCIONES },
@@ -85,6 +88,7 @@ export const ESQUEMA_DE_DECISION = {
       },
     },
     response: { type: "string" },
+    recordar: textos,
   },
 } as const;
 
@@ -111,8 +115,12 @@ export function leerDecision(valor: unknown): DecisionDelTurno {
     typeof d.response === "string" &&
     typeof d.despacho === "string" &&
     cambiosValidos &&
-    [d.knownRefs, d.faltantes, forma.opciones, forma.skus].every(listaDeTextos);
+    [d.knownRefs, d.faltantes, forma.opciones, forma.skus].every(
+      listaDeTextos,
+    ) &&
+    (d.recordar === undefined || listaDeTextos(d.recordar));
   if (!valida)
     throw new Error("decisión inválida: no cumple el esquema de decidir_turno");
-  return d as unknown as DecisionDelTurno;
+  // Un doble o un proveedor sin el campo nuevo no recuerda nada, pero decide igual.
+  return { ...d, recordar: d.recordar ?? [] } as unknown as DecisionDelTurno;
 }

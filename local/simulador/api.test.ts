@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { describe, expect, it } from "vitest";
 import type { MensajeEnviado } from "../../e2e/dobles/graph.js";
 import { aplicacionDePrueba } from "../../launcher/composicion/aplicacion-de-prueba.js";
+import { RecuerdosDeClientes } from "../../src/clientes/index.js";
 import { pedir } from "../../src/plataforma/test-support/http.js";
 import { CLIENTES_DE_EJEMPLO } from "../clientes-de-ejemplo.js";
 import type { MensajeDeMeta } from "../conversar/webhook.js";
@@ -40,6 +41,7 @@ async function mundo() {
       clientes: m.almacenes.clientes,
       aviso: m.servicios.aviso,
       responder: m.servicios.responderDesdeBandeja,
+      recuerdos: new RecuerdosDeClientes(m.almacenes.registros),
     },
     ahora: () => new Date("2026-10-16T15:00:00.000Z"),
   }).registrar(app);

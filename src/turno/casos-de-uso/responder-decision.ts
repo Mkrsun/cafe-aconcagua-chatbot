@@ -75,6 +75,8 @@ export async function ejecutarDecision(
   d: DecisionDelTurno,
 ): Promise<ResultadoDelTurno> {
   await refrescarEnlace(t, d.response);
+  if (d.recordar.length)
+    await t.deps.memoria.anotar(t.entrada.cliente.id, d.recordar);
   t.estado = conRefs(
     t.estado,
     d.knownRefs,

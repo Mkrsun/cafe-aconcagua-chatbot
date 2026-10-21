@@ -7,6 +7,8 @@ export interface PasoDelEscenario {
   readonly espera?: Espera;
   /** Lo que la respuesta tiene que nombrar (por ejemplo la comuna o el horario). */
   readonly menciona?: readonly RegExp[];
+  /** «resolver»: el equipo cierra la conversación antes y el cliente vuelve días después. */
+  readonly antes?: "resolver";
 }
 
 /** Un caso del negocio: un cliente con su tramo y una conversación de uno o más turnos. */

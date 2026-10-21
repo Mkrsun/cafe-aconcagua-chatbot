@@ -10,5 +10,6 @@ export const decision = (d: Partial<DecisionDelTurno>): DecisionDelTurno => ({
   despacho: "",
   forma: { tipo: "texto", opciones: [], skus: [] },
   response: "",
+  recordar: [],
   ...d,
 });

@@ -65,6 +65,12 @@ const REGLAS = [
   "En DERIVAR, response es una sola frase breve y empática que nombra el tema, sin prometer " +
     "contacto ni plazos y sin nombrar a nadie (ej.: «Sobre la factura para tu cafetería, " +
     "quiero darte el dato exacto»). El sistema agrega a quién se lo pasa.",
+  "recuerdo trae lo que sabes del cliente de otras conversaciones (notas y sus últimos " +
+    "pedidos, sin montos): úsalo con naturalidad («¿lo mismo de la otra vez?»), sin recitarlo. " +
+    "En recordar anota hechos nuevos que sirvan en otra conversación: método, molienda, gustos, " +
+    "su local o su comuna habitual, cada uno en una frase corta. Nunca anotes montos, RUT, " +
+    "teléfonos, correos, direcciones exactas, salud ni lo que ya está en recuerdo; si no hay " +
+    "nada nuevo, déjalo vacío.",
   "forma: «lista» con hasta 10 skus para mostrar cafés con su precio (no los escribas " +
     "también en el texto); «botones» con hasta 3 opciones cortas; «ubicacion» para pedir " +
     "dónde despachar; si no, «texto». En knownRefs anota los SKU que nombras o recomiendas; " +
@@ -99,6 +105,10 @@ export interface EntradaDelContexto {
     readonly tramo: Tramo;
   };
   readonly perfiles: readonly PerfilDeCafe[];
+  readonly recuerdo?: {
+    readonly notas: readonly string[];
+    readonly pedidosAnteriores: readonly unknown[];
+  };
   readonly faq: readonly {
     readonly pregunta: string;
     readonly respuesta: string;
@@ -115,6 +125,9 @@ export function armarContexto(e: EntradaDelContexto) {
   const user = {
     ahora: momentoEnChile(e.ahora),
     cliente: e.cliente,
+    ...(e.recuerdo?.notas.length || e.recuerdo?.pedidosAnteriores.length
+      ? { recuerdo: e.recuerdo }
+      : {}),
     estado: {
       lineas: estado.lineas,
       resumenPendiente: !!estado.propuesta,

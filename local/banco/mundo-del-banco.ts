@@ -87,10 +87,20 @@ export async function mundoDelBanco(
     if (r.status !== 200) throw new Error(`el webhook respondió ${r.status}`);
   }
 
+  /** El equipo resuelve la conversación y pasan tres días: la próxima empieza de cero. */
+  async function resolverYEsperar(telefono: string) {
+    const cliente = await app.almacenes.clientes.porTelefono(telefono);
+    const activa =
+      cliente && (await app.almacenes.bandeja.obtenerActiva(cliente.id));
+    if (activa) await app.almacenes.bandeja.resolver(activa.id);
+    reloj.avanzar(3 * 24 * 60 * MINUTO);
+  }
+
   async function conversar(e: Escenario): Promise<TurnoDelBanco[]> {
     const telefono = telefonoDe(escenarios.indexOf(e));
     const turnos: TurnoDelBanco[] = [];
     for (const paso of e.pasos) {
+      if (paso.antes === "resolver") await resolverYEsperar(telefono);
       const cliente =
         typeof paso.cliente === "string" ? [paso.cliente] : [...paso.cliente];
       const [antes, antesEquipo] = [

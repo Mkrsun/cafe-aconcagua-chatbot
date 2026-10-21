@@ -71,6 +71,10 @@ export function mundoDeAtencion(
     tarifas: () => tarifas.listar(),
     faq: async () => [],
     perfiles: async () => [],
+    memoria: {
+      leer: async () => ({ notas: [], pedidosAnteriores: [] }),
+      anotar: async () => {},
+    },
     registrarPedido: async () => {},
     cobrar: async () => undefined,
     reloj: reloj.ahora,

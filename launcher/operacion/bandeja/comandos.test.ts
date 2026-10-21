@@ -7,6 +7,7 @@ import {
   EQUIPO,
   SECRETO_DE_META,
 } from "../../composicion/aplicacion-de-prueba.js";
+import { RecuerdosDeClientes } from "../../../src/clientes/index.js";
 import { ejecutarBandeja } from "./comandos.js";
 
 const TELEFONO = EMPORIO.telefonos[0]!;
@@ -52,6 +53,7 @@ async function conUnTraspaso() {
         clientes: m.almacenes.clientes,
         aviso: m.servicios.aviso,
         responder: m.servicios.responderDesdeBandeja,
+        recuerdos: new RecuerdosDeClientes(m.almacenes.registros),
       },
       args,
     );
@@ -122,5 +124,29 @@ describe("pnpm bandeja", () => {
     await expect(m.bandeja(["ver", "56900000000"])).rejects.toThrow(
       /no existe/,
     );
+  });
+  it("muestra lo que el chatbot recuerda del cliente y lo olvida por número o entero", async () => {
+    const m = await conUnTraspaso();
+    const cliente = await m.almacenes.clientes.porTelefono(TELEFONO);
+    const recuerdos = new RecuerdosDeClientes(m.almacenes.registros);
+    await recuerdos.anotar(
+      cliente!.id,
+      ["Almacén en Recoleta", "Prefiere grano"],
+      new Date(),
+    );
+    expect(await m.bandeja(["recuerdo", TELEFONO])).toEqual([
+      `Lo que el chatbot recuerda de Emporio Dos (${TELEFONO}):`,
+      "  1. Almacén en Recoleta",
+      "  2. Prefiere grano",
+    ]);
+    expect(await m.bandeja(["olvidar", TELEFONO, "1"])).toEqual([
+      "Olvidé la nota 1.",
+    ]);
+    expect(await m.bandeja(["olvidar", TELEFONO])).toEqual([
+      "Olvidé todo lo que recordaba.",
+    ]);
+    expect(await m.bandeja(["recuerdo", TELEFONO])).toEqual([
+      `El chatbot no recuerda nada de Emporio Dos (${TELEFONO}).`,
+    ]);
   });
 });

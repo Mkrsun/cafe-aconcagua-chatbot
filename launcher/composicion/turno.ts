@@ -1,5 +1,6 @@
 import { fotoDe } from "../../src/catalogo/dominio/precio.js";
 import { PerfilesDeCafe } from "../../src/catalogo/index.js";
+import { memoriaDelCliente } from "./memoria.js";
 import type { AvisoAlEquipo } from "../../src/bandeja/casos-de-uso/aviso-al-equipo.js";
 import type { BaseDeFaq } from "../../src/faq/casos-de-uso/base-de-faq.js";
 import { GastoMensual } from "../../src/modelo/casos-de-uso/gasto-mensual.js";
@@ -42,6 +43,7 @@ export function crearTurno(c: Contexto, aviso: AvisoAlEquipo, faq: BaseDeFaq) {
     tarifas: () => a.tarifas.listar(),
     faq: () => faq.publicadas(),
     perfiles: () => perfiles.leer(),
+    memoria: memoriaDelCliente(a, reloj),
     registrarPedido: (p) => registrar.ejecutar(p),
     cobrar: (id) => cobrar.ejecutar(id),
     reloj,

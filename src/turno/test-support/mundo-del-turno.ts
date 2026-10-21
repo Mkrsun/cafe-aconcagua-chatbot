@@ -12,6 +12,7 @@ import { PedidosEnMemoria } from "../../pedidos/adaptadores/pedidos-en-memoria.j
 import { CobrarPedido } from "../../pedidos/casos-de-uso/cobrar-pedido.js";
 import { RegistrarPedido } from "../../pedidos/casos-de-uso/registrar-pedido.js";
 import { Turno } from "../casos-de-uso/turno.js";
+import type { RecuerdoParaElTurno } from "../casos-de-uso/tipos.js";
 import type { DecisionDelTurno } from "../dominio/decision.js";
 import { fotoDePrueba } from "./catalogo-de-prueba.js";
 
@@ -25,6 +26,7 @@ export const decision = (d: Partial<DecisionDelTurno>): DecisionDelTurno => ({
   despacho: "",
   forma: { tipo: "texto", opciones: [], skus: [] },
   response: "",
+  recordar: [],
   ...d,
 });
 
@@ -32,6 +34,7 @@ export interface OpcionesDelMundo {
   readonly tramo?: Tramo;
   readonly conKhipu?: boolean;
   readonly modelo?: (m: ModeloFalso) => IModelo;
+  readonly recuerdo?: RecuerdoParaElTurno;
 }
 
 /** Un turno con dobles de todo: el modelo responde lo que diga el guion, en orden. */
@@ -61,12 +64,19 @@ export async function mundoDelTurno(
   const pedidos = new PedidosEnMemoria();
   const khipu = new KhipuFalso();
   const registros = new RegistrosEnMemoria();
+  const anotadas: { clienteId: string; notas: readonly string[] }[] = [];
   const turno = new Turno({
     modelo: opciones.modelo ? opciones.modelo(falso) : falso,
     registros,
     catalogo: async () => fotoDePrueba(),
     tarifas: () => tarifas.listar(),
     perfiles: async () => [],
+    memoria: {
+      leer: async () =>
+        opciones.recuerdo ?? { notas: [], pedidosAnteriores: [] },
+      anotar: async (clienteId, notas) =>
+        void anotadas.push({ clienteId, notas }),
+    },
     faq: async () => [
       { pregunta: "¿Hacen factura?", respuesta: "Sí, con RUT y giro." },
     ],
@@ -113,5 +123,6 @@ export async function mundoDelTurno(
     registros,
     pendientes,
     tarifas,
+    anotadas,
   };
 }

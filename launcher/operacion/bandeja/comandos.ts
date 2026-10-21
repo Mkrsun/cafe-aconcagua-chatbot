@@ -7,8 +7,9 @@ import type { IBandeja } from "../../../src/bandeja/puertos/bandeja.js";
 import type { AvisoAlEquipo } from "../../../src/bandeja/index.js";
 import type { IClientes } from "../../../src/clientes/puertos/clientes.js";
 import { hiloDeConversacion, lineaDeConversacion } from "./mostrar.js";
+import { ejecutarRecuerdo, type DepsDelRecuerdo } from "./recuerdo.js";
 
-export interface DepsDeLaBandeja {
+export interface DepsDeLaBandeja extends DepsDelRecuerdo {
   readonly bandeja: IBandeja;
   readonly clientes: IClientes;
   readonly aviso: Pick<AvisoAlEquipo, "olvidar">;
@@ -26,6 +27,8 @@ export const AYUDA = [
   "pnpm bandeja pausar <id|teléfono> [motivo]",
   "pnpm bandeja reanudar <id|teléfono>   quita la pausa (si nadie la tomó, sigue el chatbot)",
   "pnpm bandeja resolver <id|teléfono>   la cierra: el chatbot atiende el próximo mensaje",
+  "pnpm bandeja recuerdo <teléfono>      lo que el chatbot recuerda del cliente",
+  "pnpm bandeja olvidar <teléfono> [n]   borra la nota n (o todas)",
 ];
 
 /** Saca `--como <nombre>` de los argumentos: quién del equipo actúa. */
@@ -49,6 +52,8 @@ export async function ejecutarBandeja(
   if (comando === "ayuda") return AYUDA;
   if (!referencia)
     throw new DatosInvalidos(`falta la conversación: ${AYUDA[2]}`);
+  if (comando === "recuerdo" || comando === "olvidar")
+    return ejecutarRecuerdo(deps, comando, referencia, texto[0]);
   const c = await buscar(deps, referencia);
   const exigirComo = () => {
     if (!como) throw new DatosInvalidos("di quién eres con --como <nombre>");

@@ -43,4 +43,23 @@ describe("el mundo del banco: la app completa en memoria con la semilla", () => 
     expect(traspaso!.chatbot[0]).toContain("A Puente Alto todavía no tengo");
     expect(traspaso!.avisosAlEquipo[0]).toContain("Te paso un cliente");
   });
+
+  it("al volver tras una conversación resuelta, el cliente trae sus pedidos", async () => {
+    const modelo = new ModeloFalso(() =>
+      decision({ action: "PROPONER", changes: [{ sku: "0028", cantidad: 2 }] }),
+    );
+    const vuelve = caso("vuelve", [
+      { cliente: "2 futaleufú molido" },
+      { cliente: "sí" },
+      { cliente: "hola! lo mismo de la otra vez", antes: "resolver" },
+    ]);
+    const banco = await mundoDelBanco(modelo, [vuelve]);
+    await banco.conversar(vuelve);
+    const ultimo = JSON.parse(modelo.llamadas.at(-1)!.user);
+    // Conversación nueva: nada de la anterior en el estado, solo en el recuerdo.
+    expect(ultimo.intercambios).toEqual([]);
+    expect(ultimo.recuerdo.pedidosAnteriores[0].productos).toEqual([
+      "2 × Futaleufú — 150 gramos / Molido",
+    ]);
+  });
 });

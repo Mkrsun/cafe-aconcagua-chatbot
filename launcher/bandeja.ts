@@ -3,6 +3,7 @@ import { relojDelSistema } from "../src/plataforma/reloj.js";
 import { leerConfiguracion } from "./config/configuracion.js";
 import { crearAplicacion } from "./composicion/aplicacion.js";
 import { bordesReales } from "./composicion/bordes.js";
+import { RecuerdosDeClientes } from "../src/clientes/index.js";
 import { ejecutarBandeja } from "./operacion/bandeja/comandos.js";
 import { explicar } from "./operacion/bandeja/explicar.js";
 
@@ -28,6 +29,7 @@ async function main() {
         bandeja: almacenes.bandeja,
         clientes: almacenes.clientes,
         aviso: servicios.aviso,
+        recuerdos: new RecuerdosDeClientes(almacenes.registros),
         responder: servicios.responderDesdeBandeja,
       },
       process.argv.slice(2),
