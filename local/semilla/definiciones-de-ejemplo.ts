@@ -22,6 +22,7 @@ export const DEFINICIONES_DE_EJEMPLO: DefinicionesDeCafe = {
   }),
   despacho: ZONAS,
   preguntas: PREGUNTAS,
+  perfiles: DEFINICIONES_DE_CAFE.perfiles,
 };
 
 /** Los clientes de `pnpm conversar`, con consentimiento. */

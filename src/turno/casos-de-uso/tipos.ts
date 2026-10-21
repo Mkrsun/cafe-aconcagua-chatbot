@@ -2,6 +2,7 @@ import type { IRegistros } from "../../plataforma/registros/puerto.js";
 import type { Reloj } from "../../plataforma/reloj.js";
 import type { TarifaDeDespacho } from "../../catalogo/dominio/despacho/tarifa.js";
 import type { FotoDelCatalogo } from "../../catalogo/dominio/precio.js";
+import type { PerfilDeCafe } from "../../catalogo/index.js";
 import type { Tramo } from "../../catalogo/dominio/tramos.js";
 import type { IModelo } from "../../modelo/puertos/modelo.js";
 import type { PedidoNuevo } from "../../pedidos/dominio/pedido.js";
@@ -19,6 +20,8 @@ export interface DepsDelTurno {
   readonly faq: () => Promise<
     readonly { pregunta: string; respuesta: string }[]
   >;
+  /** Las notas de cata de cada café (las carga `pnpm cargar`). */
+  readonly perfiles: () => Promise<readonly PerfilDeCafe[]>;
   readonly registrarPedido: (p: PedidoNuevo) => Promise<void>;
   /** El enlace de Khipu, o `undefined` si no hay cobro automático. */
   readonly cobrar: (pedidoId: string) => Promise<{ url: string } | undefined>;
@@ -62,6 +65,7 @@ export interface TurnoEnCurso {
   readonly foto: FotoDelCatalogo;
   readonly tarifas: readonly TarifaDeDespacho[];
   readonly faq: readonly { pregunta: string; respuesta: string }[];
+  readonly perfiles: readonly PerfilDeCafe[];
   readonly ahora: Date;
   estado: EstadoDelTurno;
   inferencias: number;

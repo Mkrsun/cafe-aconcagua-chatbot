@@ -66,6 +66,7 @@ export async function mundoDelTurno(
     registros,
     catalogo: async () => fotoDePrueba(),
     tarifas: () => tarifas.listar(),
+    perfiles: async () => [],
     faq: async () => [
       { pregunta: "¿Hacen factura?", respuesta: "Sí, con RUT y giro." },
     ],

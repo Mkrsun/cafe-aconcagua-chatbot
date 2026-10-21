@@ -1,4 +1,5 @@
 import type { FotoDelCatalogo } from "../../catalogo/dominio/precio.js";
+import type { PerfilDeCafe } from "../../catalogo/dominio/perfil.js";
 import type { Tramo } from "../../catalogo/dominio/tramos.js";
 import type { EstadoDelTurno } from "./estado.js";
 import { ocultarMontos } from "./marcadores.js";
@@ -79,6 +80,16 @@ const catalogoSinMontos = (foto: FotoDelCatalogo) =>
     ),
   ].join("\n");
 
+/** Las notas de cata: estables entre cargas, van en el prefijo junto al catálogo. */
+const notasDeCata = (perfiles: readonly PerfilDeCafe[]) =>
+  perfiles.length
+    ? [
+        "",
+        "Notas de cata (familia: notas):",
+        ...perfiles.map((p) => `${p.familia}: ${p.notas}`),
+      ].join("\n")
+    : "";
+
 export interface EntradaDelContexto {
   readonly foto: FotoDelCatalogo;
   readonly estado: EstadoDelTurno;
@@ -87,6 +98,7 @@ export interface EntradaDelContexto {
     readonly tipo: string;
     readonly tramo: Tramo;
   };
+  readonly perfiles: readonly PerfilDeCafe[];
   readonly faq: readonly {
     readonly pregunta: string;
     readonly respuesta: string;
@@ -126,7 +138,7 @@ export function armarContexto(e: EntradaDelContexto) {
     mensaje: e.texto,
   };
   return {
-    system: `${REGLAS}\n\n${catalogoSinMontos(e.foto)}`,
+    system: `${REGLAS}\n\n${catalogoSinMontos(e.foto)}${notasDeCata(e.perfiles)}`,
     user: JSON.stringify(user),
   };
 }

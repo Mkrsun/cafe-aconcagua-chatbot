@@ -70,6 +70,7 @@ export function mundoDeAtencion(
     catalogo: async () => fotoDePrueba(),
     tarifas: () => tarifas.listar(),
     faq: async () => [],
+    perfiles: async () => [],
     registrarPedido: async () => {},
     cobrar: async () => undefined,
     reloj: reloj.ahora,

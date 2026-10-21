@@ -8,6 +8,9 @@ const entrada = {
   estado: ESTADO_INICIAL,
   cliente: { nombre: "Ana", tipo: "minorista", tramo: "minorista" as const },
   faq: [],
+  perfiles: [
+    { familia: "futaleufu", notas: "Chocolate y nuez; cuerpo medio." },
+  ],
   zonas: [],
   texto: "¿atienden hoy?",
   ahora: new Date("2026-10-20T15:00:00.000Z"),
@@ -22,6 +25,12 @@ describe("el contexto de una inferencia", () => {
     });
     expect(JSON.parse(hoy.user).ahora).toBe("martes 20 de octubre, 12:00");
     expect(manana.system).toBe(hoy.system);
+  });
+
+  it("las notas de cata de cada café van en el prefijo, junto al catálogo", () => {
+    const { system } = armarContexto(entrada);
+    expect(system).toContain("Notas de cata (familia: notas):");
+    expect(system).toContain("futaleufu: Chocolate y nuez; cuerpo medio.");
   });
 
   it("el catálogo del prefijo no trae montos ni el tramo del cliente", () => {
