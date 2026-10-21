@@ -148,7 +148,7 @@ Todo se configura con variables de entorno en el servidor. La lista completa est
 ## Cómo seguir desarrollándolo con Claude Code
 
 La guía completa para tomar el proyecto desde cero (con otra cuenta de Claude Code) está en
-`docs/traspaso.md`: el estado, los PRs por integrar, lo que falta para publicar y las decisiones tomadas.
+`docs/traspaso.md`: el estado, lo que se hizo, lo que falta para publicar y las decisiones tomadas.
 
 El repo está preparado para trabajar con Claude Code (o con cualquier agente), y `CLAUDE.md` tiene las
 reglas. El camino para cualquier cambio:

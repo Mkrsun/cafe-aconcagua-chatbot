@@ -17,7 +17,7 @@ comandos:
   devolvérselas al chatbot o resolverlas.
 
 Para Café, en simple: `docs/entrega.md` explica qué hace el producto, qué no hace, cómo se opera y qué se
-configura. Para continuar el desarrollo desde cero (estado, PRs por integrar, pendientes y decisiones):
+configura. Para continuar el desarrollo desde cero (estado, pendientes y decisiones):
 `docs/traspaso.md`.
 
 ## Probar en local en 5 pasos

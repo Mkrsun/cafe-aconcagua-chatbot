@@ -6,7 +6,7 @@ producto de **un solo negocio**: lo propio de Café está fijo en el código y e
 multi-tenant, plugins, admin web ni API de operación. El equipo opera desde la terminal (`pnpm cargar` y
 `pnpm bandeja`).
 
-Si es tu primera vez aquí, lee `docs/traspaso.md` (estado, PRs pendientes, qué falta y decisiones tomadas),
+Si es tu primera vez aquí, lee `docs/traspaso.md` (estado, qué falta para publicar y decisiones tomadas),
 `README.md` y `SETUP.md` (cómo levantarlo y probarlo en local).
 
 ## Cómo se trabaja (reglas del repo)

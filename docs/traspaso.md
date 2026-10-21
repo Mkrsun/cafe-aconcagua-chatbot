@@ -64,39 +64,24 @@ código directo, organizado por área del negocio en `src/` (el mapa completo es
 
 ---
 
-## 2. Qué se hizo en la última etapa (y en qué orden integrarlo)
+## 2. Qué se hizo en la última etapa
 
-El trabajo quedó en **pull requests apilados**: cada uno parte del anterior y apunta a él, así que en
-GitHub cada PR muestra solo sus propios cambios. Se integran **en orden**, del #1 al #8, y cada uno a
-`main`.
+Todo está integrado en `main` (21 de octubre de 2026): no quedan PRs abiertos. Cada PR conserva su
+descripción con la evidencia (pruebas y mediciones), útil para entender por qué se hizo cada cosa:
 
-| PR | Rama | Qué trae |
-|---|---|---|
-| [#1](https://github.com/Mkrsun/cafe-aconcagua-chatbot/pull/1) | `claude/entrega-inicial` | El producto completo: WhatsApp, turno, catálogo, pedidos, Khipu, bandeja, CRM, simulador y despliegue |
-| [#2](https://github.com/Mkrsun/cafe-aconcagua-chatbot/pull/2) | `feat/modelo-responses-api` | El modelo por la Responses API de OpenAI, con razonamiento (`medium`) |
-| [#3](https://github.com/Mkrsun/cafe-aconcagua-chatbot/pull/3) | `fix/turno-respuestas` | 7 errores que el cliente veía: «el precio cambió» falso, $0, precio repetido, SKU visible, listas vacías… |
-| [#4](https://github.com/Mkrsun/cafe-aconcagua-chatbot/pull/4) | `feat/local-banco` | `pnpm banco`: conversaciones reales contra el modelo, con informe |
-| [#5](https://github.com/Mkrsun/cafe-aconcagua-chatbot/pull/5) | `feat/turno-voz` | Voz más cálida y natural (de 18/22 a 22/22 en el banco) |
-| [#6](https://github.com/Mkrsun/cafe-aconcagua-chatbot/pull/6) | `feat/catalogo-perfiles` | Notas de cata por café (plantilla vacía para completar) |
-| [#7](https://github.com/Mkrsun/cafe-aconcagua-chatbot/pull/7) | `feat/clientes-memoria` | Memoria del cliente entre conversaciones |
-| [#8](https://github.com/Mkrsun/cafe-aconcagua-chatbot/pull/8) | `docs/traspaso` | Esta guía y la documentación al día |
+| PR | Qué trajo |
+|---|---|
+| [#1](https://github.com/Mkrsun/cafe-aconcagua-chatbot/pull/1) | El producto completo: WhatsApp, turno, catálogo, pedidos, Khipu, bandeja, CRM, simulador y despliegue |
+| [#2](https://github.com/Mkrsun/cafe-aconcagua-chatbot/pull/2) | El modelo por la Responses API de OpenAI, con razonamiento (`medium`) |
+| [#3](https://github.com/Mkrsun/cafe-aconcagua-chatbot/pull/3) | 7 errores que el cliente veía: «el precio cambió» falso, $0, precio repetido, SKU visible, listas vacías… |
+| [#4](https://github.com/Mkrsun/cafe-aconcagua-chatbot/pull/4) | `pnpm banco`: conversaciones reales contra el modelo, con informe |
+| [#5](https://github.com/Mkrsun/cafe-aconcagua-chatbot/pull/5) | Voz más cálida y natural (de 18/22 a 22/22 en el banco) |
+| [#6](https://github.com/Mkrsun/cafe-aconcagua-chatbot/pull/6) | Notas de cata por café (plantilla vacía para completar) |
+| [#7](https://github.com/Mkrsun/cafe-aconcagua-chatbot/pull/7) | Memoria del cliente entre conversaciones |
+| [#8](https://github.com/Mkrsun/cafe-aconcagua-chatbot/pull/8) | Esta guía y la documentación al día |
 
-Para cada PR, en orden: primero se apunta a `main` (como ya contiene a los anteriores, solo quedan sus
-cambios) y después se integra. Con el #1, que ya apunta a `main`, basta el segundo paso:
-
-```bash
-gh pr edit 2 --base main
-```
-
-```bash
-gh pr merge 2 --merge
-```
-
-y lo mismo con el 3, el 4… hasta el 8. El CI de GitHub (`verify` y las tres suites de punta a punta) corre
-solo cuando el PR apunta a `main`: después del `gh pr edit`, espera a que `gh pr checks 2` quede en verde
-antes de integrar. O pídeselo a Claude: «integra los PRs del #1 al #8 en orden, cada
-uno a main, revisando que el CI quede en verde». Si alguno queda con conflictos, pídele que traiga lo último
-de `main` a esa rama y los resuelva.
+Desde ahora, cada cambio va en su rama con su PR a `main`, y el CI de GitHub (`verify` y las tres suites
+de punta a punta) tiene que quedar en verde antes de integrarlo.
 
 ---
 
@@ -119,7 +104,9 @@ Las claves **nunca** van al repo ni a un chat: viven en `.env` (local) o en `dep
 
 ## 4. Ponerlo a andar en tu computador (30 minutos)
 
-La guía detallada, con lo que vas a ver en cada paso, está en `SETUP.md`. El camino corto:
+La guía detallada, con lo que vas a ver en cada paso, está en `SETUP.md`. El camino corto (si recibiste
+el proyecto en un zip, descomprímelo y salta el `git clone`; para trabajar con ramas y PRs pide acceso al
+repo en GitHub):
 
 ```bash
 git clone https://github.com/Mkrsun/cafe-aconcagua-chatbot.git
@@ -206,7 +193,7 @@ nota tiene hasta 300 caracteres y no lleva precios. El formato está explicado e
 4. Pídele primero que se oriente:
 
    > Lee `docs/traspaso.md` y `CLAUDE.md`, corre `pnpm verify` y dime en qué estado está el proyecto y qué
-   > PRs faltan por integrar.
+   > falta para publicarlo.
 
 ### Cómo pedir cambios
 
