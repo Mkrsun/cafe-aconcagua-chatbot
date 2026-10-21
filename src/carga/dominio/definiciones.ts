@@ -23,6 +23,12 @@ export interface PreguntaDefinida {
   readonly tema: Tema;
 }
 
+/** Las notas de cata de un café (su familia); vacías mientras no estén escritas. */
+export interface PerfilDefinido {
+  readonly familia: string;
+  readonly notas: string;
+}
+
 /** Un cliente con su consentimiento de WhatsApp y de dónde viene. */
 export interface ClienteDefinido extends DatosDeCliente {
   readonly consentimiento: Consentimiento;
@@ -34,4 +40,5 @@ export interface DefinicionesDeCafe {
   readonly catalogo: readonly FormatoDefinido[];
   readonly despacho: readonly ZonaDefinida[];
   readonly preguntas: readonly PreguntaDefinida[];
+  readonly perfiles: readonly PerfilDefinido[];
 }

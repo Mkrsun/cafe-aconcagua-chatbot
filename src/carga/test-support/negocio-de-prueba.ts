@@ -39,6 +39,7 @@ export const NEGOCIO_DE_PRUEBA: DefinicionesDeCafe = {
       tema: "horarios",
     },
   ],
+  perfiles: [],
 };
 
 const cliente = (

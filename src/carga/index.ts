@@ -4,6 +4,7 @@ export type {
   ClienteDefinido,
   DefinicionesDeCafe,
   FormatoDefinido,
+  PerfilDefinido,
   PreguntaDefinida,
   ZonaDefinida,
 } from "./dominio/definiciones.js";
