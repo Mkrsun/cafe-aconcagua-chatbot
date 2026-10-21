@@ -6,8 +6,12 @@ import {
   conRefs,
   propuestaVigente,
 } from "../dominio/estado.js";
+import { aperturaDelModelo } from "../dominio/apertura.js";
 import { formaPropuesta } from "../dominio/forma.js";
-import { renderizarPrecios } from "../dominio/marcadores.js";
+import {
+  renderizarPrecios,
+  sinMarcadoresDePrecio,
+} from "../dominio/marcadores.js";
 import { fraseDeDespacho, textoDelResumen } from "../dominio/resumen.js";
 import { enlaceDePago, TEXTOS } from "../dominio/textos.js";
 import {
@@ -48,7 +52,10 @@ function hechos(
     tramo: t.entrada.cliente.tramo,
     rol: t.deps.rol,
   };
-  return renderizarPrecios(conHechos, precios).texto.trim();
+  // `{{despacho}}` es una oración con su punto: el del modelo sobra.
+  return renderizarPrecios(conHechos, precios)
+    .texto.replace(/(?<!\.)\.\.(?!\.)/g, ".")
+    .trim();
 }
 
 /** El enlace vigente del pedido: si el cobro venció o se rechazó, el cobro crea uno nuevo. */
@@ -74,20 +81,19 @@ export async function ejecutarDecision(
     new Set(t.foto.visibles.map((f) => f.sku)),
   );
   const texto = t.entrada.texto;
-  if (d.action === "DERIVAR")
-    return traspasar(
-      t,
-      d.intent === "informacion"
-        ? porFaltaDeDato(texto, d.faltantes)
-        : porDerivacion(texto),
-    );
+  const { lugar, tarifa } = despachoDe(t, d.despacho);
+  // Una comuna sin tarifa es un traspaso de despacho, aunque el modelo haya pedido otro.
+  if (lugar && !tarifa) return traspasar(t, porZonaSinTarifa(texto, lugar));
+  if (d.action === "DERIVAR") return traspasar(t, derivacion(d, texto));
   const confirmaSinCambios = d.action === "CONFIRMAR" && !d.changes.length;
   if (confirmaSinCambios && propuestaVigente(t.estado, t.ahora))
     return aceptar(t);
+  // En el resumen va cada monto: un precio suelto en la entrada lo repetiría.
+  const entrada = () => hechos(t, sinMarcadoresDePrecio(d.response));
   if (d.action === "PROPONER" || d.action === "CONFIRMAR")
-    return proponer(t, hechos(t, d.response), d.changes, d.despacho);
-  const { lugar, tarifa } = despachoDe(t, d.despacho);
-  if (lugar && !tarifa) return traspasar(t, porZonaSinTarifa(texto, lugar));
+    return proponer(t, entrada(), d.changes, d.despacho);
+  if (lugar && faltaDespachoEnElResumen(t, tarifa!.zona))
+    return proponer(t, entrada(), [], lugar);
   if (lugar) t.estado = { ...t.estado, zona: lugar };
   const respuesta = hechos(t, d.response, tarifa);
   if (d.intent === "reclamo") return reclamo(t, respuesta);
@@ -98,6 +104,17 @@ export async function ejecutarDecision(
   });
   return responder(t, respuesta, contenido ? { contenido } : {});
 }
+
+function derivacion(d: DecisionDelTurno, texto: string) {
+  const apertura = aperturaDelModelo(d.response);
+  return d.intent === "informacion"
+    ? porFaltaDeDato(texto, d.faltantes, apertura)
+    : porDerivacion(texto, apertura);
+}
+
+/** La comuna llegó después del resumen: el cliente tiene que ver el total con su despacho. */
+const faltaDespachoEnElResumen = (t: TurnoEnCurso, zona: string) =>
+  !!t.estado.propuesta && t.estado.propuesta.despacho?.zona !== zona;
 
 const SIGUE_ATENDIENDO = "El chatbot pidió lo que falta y sigue atendiendo.";
 

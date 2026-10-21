@@ -65,6 +65,9 @@ export function proponer(
   if (lugar && !tarifa)
     return traspasar(t, porZonaSinTarifa(t.entrada.texto, lugar));
   const lineas = aplicarCambios(t.estado.lineas, cambios);
+  // Sin productos no hay nada que confirmar: un resumen en $0 con botones confunde.
+  if (!lineas.length)
+    return responder(t, entrada.trim() || TEXTOS.queTeGustaria);
   const propuesta = propuestaDe(t, lineas, lugar);
   t.estado = {
     ...t.estado,
@@ -87,7 +90,10 @@ export async function aceptar(t: TurnoEnCurso): Promise<ResultadoDelTurno> {
   const nueva = propuestaDe(t, t.estado.lineas, t.estado.zona);
   if (nueva.digest !== vigente.digest) {
     t.estado = { ...t.estado, propuesta: nueva };
-    const texto = `${TEXTOS.precioCambio}\n${textoDelResumen(nueva)}`;
+    const aviso = cambioDePrecio(vigente, nueva)
+      ? TEXTOS.precioCambio
+      : TEXTOS.despachoCambio;
+    const texto = `${aviso}\n${textoDelResumen(nueva)}`;
     return responder(t, texto, { contenido: botonesDelResumen(texto) });
   }
   const conversacion = t.entrada.conversacionId;
@@ -114,6 +120,10 @@ export async function aceptar(t: TurnoEnCurso): Promise<ResultadoDelTurno> {
   const texto = pedidoRegistrado(enlace.url);
   return responder(t, texto, { contenido: botonPagar(texto, enlace.url) });
 }
+
+/** Si cambió el precio de algún producto o solo el despacho (una tarifa nueva). */
+const cambioDePrecio = (antes: Propuesta, ahora: Propuesta) =>
+  huellaDe(antes.lineas) !== huellaDe(ahora.lineas);
 
 /** «No» o «Cambiar algo» al resumen: se retira la propuesta (las líneas quedan para corregir). */
 export function retirar(t: TurnoEnCurso): ResultadoDelTurno {
