@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# El chatbot en el VPS, en simple. Se corre desde la carpeta del proyecto:  ./deploy/cafe <comando>
+set -euo pipefail
+cd "$(dirname "$0")"
+
+if [ ! -f produccion.env ]; then
+  echo "Falta deploy/produccion.env. Créalo con: cp deploy/produccion.env.example deploy/produccion.env"
+  exit 1
+fi
+compose() { docker compose --env-file produccion.env -f docker-compose.yml "$@"; }
+comando() { echo node --import tsx "launcher/$1.ts"; }
+
+ayuda() {
+  cat <<'TEXTO'
+Uso: ./deploy/cafe <comando>
+
+  arrancar               construye y levanta todo (la primera vez y después de cambiar produccion.env)
+  cargar                 carga definiciones/ (catálogo, precios, despacho, preguntas) en la base
+  clientes ARCHIVO.json  carga o actualiza los clientes de ese archivo (va en deploy/clientes/)
+  bandeja [...]          la bandeja del equipo (./deploy/cafe bandeja ayuda)
+  estado                 qué está corriendo y si el chatbot responde
+  logs                   lo que va pasando (Ctrl+C para salir)
+  respaldo               guarda una copia de la base en deploy/respaldos/
+  actualizar             baja la última versión de GitHub y reinicia
+  detener                apaga todo (los datos quedan guardados)
+TEXTO
+}
+
+case "${1:-ayuda}" in
+  arrancar) compose up -d --build ;;
+  cargar) compose run --rm app $(comando cargar) ;;
+  clientes)
+    archivo="$(basename "${2:?Indica el archivo: ./deploy/cafe clientes clientes.json}")"
+    [ -f "clientes/$archivo" ] || { echo "No encuentro deploy/clientes/$archivo"; exit 1; }
+    compose run --rm app $(comando cargar) --clientes "clientes/$archivo" ;;
+  bandeja) shift; compose exec app $(comando bandeja) "$@" ;;
+  estado)
+    compose ps
+    compose exec app node -e "fetch('http://127.0.0.1:8092/salud').then(r=>r.json()).then(j=>console.log('Chatbot:', j.ok ? 'responde' : j))" ;;
+  logs) compose logs -f --tail 100 app ;;
+  respaldo)
+    mkdir -p respaldos
+    destino="respaldos/cafe-$(date +%Y-%m-%d-%H%M).sql.gz"
+    compose exec -T db pg_dump -U cafe cafe | gzip > "$destino"
+    echo "Respaldo guardado en deploy/$destino" ;;
+  actualizar) git -C .. pull --ff-only && compose up -d --build ;;
+  detener) compose down ;;
+  *) ayuda ;;
+esac

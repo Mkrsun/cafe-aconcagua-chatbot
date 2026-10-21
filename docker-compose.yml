@@ -1,0 +1,23 @@
+# PostgreSQL 16 para probar el producto en el computador. Solo desarrollo: usuario y
+# contraseña de ejemplo, publicado únicamente en 127.0.0.1.
+#   docker compose up -d
+#   DATABASE_URL=postgresql://cafe:cafe@127.0.0.1:5433/cafe_dev
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: cafe
+      POSTGRES_PASSWORD: cafe
+      POSTGRES_DB: cafe_dev
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - cafe_dev_datos:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cafe -d cafe_dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  cafe_dev_datos:

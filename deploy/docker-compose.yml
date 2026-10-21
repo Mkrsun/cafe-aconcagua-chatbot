@@ -1,0 +1,51 @@
+# Producción en un VPS: la base, el chatbot y Caddy (HTTPS automático). Se usa siempre a través de
+# `./deploy/cafe …`, que le pasa `deploy/produccion.env`.
+name: cafe-aconcagua
+
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: cafe
+      POSTGRES_DB: cafe
+      POSTGRES_PASSWORD: ${CAFE_DB_CLAVE:?falta CAFE_DB_CLAVE en deploy/produccion.env}
+    volumes:
+      - datos:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cafe -d cafe"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  app:
+    build: ..
+    restart: unless-stopped
+    env_file: produccion.env
+    environment:
+      CAFE_ENV: produccion
+      CAFE_PUERTO: "8092"
+      DATABASE_URL: postgresql://cafe:${CAFE_DB_CLAVE}@db:5432/cafe
+    volumes:
+      - ./clientes:/app/clientes:ro
+    depends_on:
+      db:
+        condition: service_healthy
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    environment:
+      CAFE_DOMINIO: ${CAFE_DOMINIO:?falta CAFE_DOMINIO en deploy/produccion.env}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - certificados:/data
+    depends_on:
+      - app
+
+volumes:
+  datos:
+  certificados:

@@ -1,0 +1,46 @@
+{
+  "name": "cafe-aconcagua-chatbot",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.test.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "arquitectura": "depcruise src launcher definiciones",
+    "format": "prettier --no-error-on-unmatched-pattern --write 'src/**/*.ts' 'launcher/**/*.ts' 'local/**/*.{ts,js,css,html}' 'definiciones/**/*.ts' vitest.config.ts 'e2e/**/*.ts' playwright.config.ts",
+    "format:check": "prettier --no-error-on-unmatched-pattern --check 'src/**/*.ts' 'launcher/**/*.ts' 'local/**/*.{ts,js,css,html}' 'definiciones/**/*.ts' vitest.config.ts 'e2e/**/*.ts' playwright.config.ts",
+    "verify": "pnpm typecheck && pnpm format:check && pnpm legibilidad && pnpm arquitectura && pnpm test",
+    "dev": "node --env-file=.env --import tsx launcher/main.ts",
+    "start": "node --import tsx launcher/main.ts",
+    "cargar": "node --env-file-if-exists=.env --import tsx launcher/cargar.ts",
+    "bandeja": "node --env-file-if-exists=.env --import tsx launcher/bandeja.ts",
+    "semilla": "node --env-file-if-exists=.env --import tsx local/semilla/main.ts",
+    "local": "node --env-file-if-exists=.env --import tsx local/modo-local/main.ts",
+    "conversar": "node --env-file-if-exists=.env --import tsx local/conversar/main.ts",
+    "legibilidad": "node scripts/lineas-largas.mjs",
+    "e2e:smoke": "playwright test e2e/smoke",
+    "e2e:critical": "playwright test e2e/critical",
+    "e2e:simulador": "playwright test e2e/simulador",
+    "e2e": "playwright test"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.13.7",
+    "hono": "^4.6.14",
+    "pg": "^8.23.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1",
+    "@types/node": "^24.0.0",
+    "@types/pg": "^8.21.0",
+    "dependency-cruiser": "^18.5.0",
+    "prettier": "^3.6.2",
+    "tsx": "^4.22.4",
+    "typescript": "^5.6.0",
+    "vitest": "^3.0.0"
+  },
+  "packageManager": "pnpm@10.19.0",
+  "engines": {
+    "node": ">=24"
+  }
+}

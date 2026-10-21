@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "es2022",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": false,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "types": ["node"]
+  },
+  "include": ["src/**/*.ts", "launcher/**/*.ts", "local/**/*.ts", "definiciones/**/*.ts", "vitest.config.ts"],
+  "exclude": ["src/**/*.test.ts", "launcher/**/*.test.ts", "local/**/*.test.ts"]
+}
