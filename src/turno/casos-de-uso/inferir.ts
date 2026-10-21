@@ -48,6 +48,7 @@ export async function inferir(t: TurnoEnCurso): Promise<DecisionDelTurno> {
       faq: t.faq,
       zonas: zonasVisibles(t.tarifas),
       texto: t.entrada.texto,
+      ahora: t.ahora,
       reparar,
     });
     t.inferencias++;
