@@ -119,4 +119,23 @@ export const CASOS_DE_VENTA: readonly Escenario[] = [
       },
     ],
   },
+  {
+    id: "cliente-que-vuelve",
+    descripcion:
+      "Compra, el equipo cierra la conversación y vuelve por lo mismo",
+    cliente: minorista("Rosa Valdés"),
+    pasos: [
+      {
+        cliente: "hola! quiero 2 futaleufú molido, lo preparo en moka",
+        espera: "resumen",
+      },
+      { cliente: "sí", espera: "pago" },
+      {
+        cliente: "hola de nuevo! me mandas lo mismo de la otra vez?",
+        antes: "resolver",
+        espera: "resumen",
+        menciona: [/2 × Futaleufú — 150 gramos \/ Molido/],
+      },
+    ],
+  },
 ];
