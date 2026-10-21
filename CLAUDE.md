@@ -6,7 +6,8 @@ producto de **un solo negocio**: lo propio de Café está fijo en el código y e
 multi-tenant, plugins, admin web ni API de operación. El equipo opera desde la terminal (`pnpm cargar` y
 `pnpm bandeja`).
 
-Si es tu primera vez aquí, lee `README.md` y `SETUP.md` (cómo levantarlo y probarlo en local).
+Si es tu primera vez aquí, lee `docs/traspaso.md` (estado, PRs pendientes, qué falta y decisiones tomadas),
+`README.md` y `SETUP.md` (cómo levantarlo y probarlo en local).
 
 ## Cómo se trabaja (reglas del repo)
 
@@ -35,21 +36,22 @@ Si es tu primera vez aquí, lee `README.md` y `SETUP.md` (cómo levantarlo y pro
 
 | Ruta | Qué hay |
 |---|---|
-| `definiciones/` | **Lo que define a Café**: catálogo (SKU y precio por tramo), zonas de despacho y preguntas frecuentes. `pnpm cargar` deja la base igual a esto |
+| `definiciones/` | **Lo que define a Café**: catálogo (SKU y precio por tramo), zonas de despacho, preguntas frecuentes y notas de cata (`perfiles.ts`). `pnpm cargar` deja la base igual a esto |
 | `src/plataforma/` | Núcleo compartido: registros duraderos, reloj, PostgreSQL y migraciones, utilidades de texto, pesos y teléfonos. **No importa de las features.** |
 | `src/whatsapp/` | Borde de WhatsApp Cloud API: webhook firmado, entrantes, canal de salida, mensajes interactivos, ventana de 24 h, plantillas por nombre, espera humana y cola durable |
-| `src/turno/` | El Turn Agent: una decisión del modelo por lote, marcadores de precio, resumen, confirmación chilena, reclamos y traspasos |
-| `src/modelo/` | Borde del LLM (un proveedor compatible con OpenAI) y el límite de gasto mensual con avisos |
-| `src/catalogo/` | Catálogo y precios por tramo en PostgreSQL, con auditoría, y despacho por zona |
+| `src/turno/` | El Turn Agent: una decisión del modelo por lote, marcadores de precio, resumen, confirmación chilena, reclamos, traspasos y memoria del cliente. **La voz y las reglas del modelo viven en `dominio/contexto.ts`** |
+| `src/modelo/` | Borde del LLM (OpenAI por la Responses API, o `/chat/completions` con `CAFE_MODELO_API=chat`) y el límite de gasto mensual con avisos |
+| `src/catalogo/` | Catálogo y precios por tramo en PostgreSQL, con auditoría, despacho por zona y notas de cata de cada café |
 | `src/carga/` | La carga de `definiciones/` (y de un archivo de clientes) a la base: crea, actualiza y archiva |
-| `src/pedidos/` | Pedidos, cobro por Khipu y aviso de pago recibido |
+| `src/pedidos/` | Pedidos, cobro por Khipu, aviso de pago recibido y los pedidos anteriores de un cliente (sin montos) |
 | `src/bandeja/` | Conversaciones, traspaso con aviso al equipo y respuestas del equipo |
-| `src/clientes/` | CRM básico: clientes, consentimiento y política de contacto |
+| `src/clientes/` | CRM básico: clientes, consentimiento, política de contacto y el recuerdo del cliente (notas breves) |
 | `src/faq/` | Preguntas frecuentes (borrador/publicada, sin montos) |
 | `src/atencion/` | Orquestación: recibir el webhook, despachar lotes vencidos y entregar la respuesta |
 | `launcher/` | Raíz de composición, configuración por entorno y los ejecutables: `main.ts` (servidor), `cargar.ts` y `bandeja.ts` (comandos del equipo) |
 | `e2e/` | Playwright: `smoke` y `critical` sin navegador y `simulador` en Chromium, con el servidor real, una base `cafe_test_e2e_*` por prueba y dobles HTTP (`e2e/dobles`) |
-| `local/` | Probar en local: `semilla` (datos de ejemplo), `modo-local` (servidor real con WhatsApp y Khipu dobles), `simulador` (página web solo local: teléfono del cliente, bandeja y gasto) y `conversar` (CLI del cliente). Como `e2e/`, fuera de `pnpm arquitectura` |
+| `local/` | Probar en local: `semilla` (datos de ejemplo), `modo-local` (servidor real con WhatsApp y Khipu dobles), `simulador` (página web solo local: teléfono del cliente, bandeja y gasto), `conversar` (CLI del cliente) y `banco` (conversaciones de referencia contra el modelo real, con informe). Como `e2e/`, fuera de `pnpm arquitectura` |
+| `docs/` | `entrega.md` (para Café, en simple), `manual-produccion.md` (publicar) y `traspaso.md` (continuar el proyecto) |
 | `deploy/` | Producción en un VPS: `docker-compose.yml` (base, chatbot y Caddy con HTTPS), `produccion.env.example` y el comando `./deploy/cafe`. Guía: `docs/manual-produccion.md` |
 | `migrations/` | SQL de PostgreSQL (esquema `cafe`), numeradas e idempotentes |
 
@@ -68,7 +70,12 @@ pnpm cargar [--clientes archivo.json]   # deja la base igual a definiciones/ (y 
 pnpm bandeja [comando]       # el equipo atiende conversaciones (pnpm bandeja ayuda)
 pnpm e2e:smoke | e2e:critical | e2e:simulador | e2e   # punta a punta
 pnpm semilla | local | conversar       # probar en local (local abre el simulador); solo cafe_dev*
+pnpm banco [--esfuerzo low,medium] [--casos a,b]   # casos reales contra el modelo de .env (gasta tokens)
 ```
+
+**Cambios de voz, reglas, modelo o esfuerzo**: se miden con `pnpm banco` antes y después, y el resultado va
+en el PR. Las pruebas usan un modelo falso: garantizan las reglas, no el tono. Un caso nuevo del negocio se
+agrega en `local/banco/casos-de-*.ts`.
 
 La suite `e2e:simulador` usa el Chromium preinstalado de `/opt/pw-browsers`: en el entorno de los agentes
 nunca se ejecuta `playwright install`. El simulador vive solo en `local/` (servidor de los dobles, 127.0.0.1)

@@ -17,7 +17,8 @@ comandos:
   devolvérselas al chatbot o resolverlas.
 
 Para Café, en simple: `docs/entrega.md` explica qué hace el producto, qué no hace, cómo se opera y qué se
-configura.
+configura. Para continuar el desarrollo desde cero (estado, PRs por integrar, pendientes y decisiones):
+`docs/traspaso.md`.
 
 ## Probar en local en 5 pasos
 
@@ -75,6 +76,7 @@ psql -U postgres -c "CREATE USER cafe WITH PASSWORD 'cafe'" -c "CREATE DATABASE 
 | `definiciones/catalogo.ts` | Cada formato (SKU) con su café, gramaje, disponibilidad y precio minorista y mayorista. `null` = precio pendiente |
 | `definiciones/despacho.ts` | Las zonas de despacho: comunas, costo, desde qué total es gratis y plazo en días hábiles |
 | `definiciones/preguntas-frecuentes.ts` | Lo que el chatbot puede contestar sobre el negocio (horarios, retiro, pagos…), sin montos |
+| `definiciones/perfiles.ts` | Las notas de cata de cada café (sabor, acidez, cuerpo, método), hasta 300 caracteres y sin montos. Vacías = el chatbot recomienda por formato y pregunta gustos |
 
 Para cambiar algo, edita el archivo, revisa el cambio con `pnpm verify` y corre `pnpm cargar` contra la base.
 La carga valida todo antes de escribir y muestra cada cambio. Lo que se quita de las definiciones queda
@@ -112,7 +114,14 @@ pnpm bandeja tomar 56933334444 --como Glei     # te la asignas sin escribir
 pnpm bandeja pausar 56933334444 [motivo]       # el chatbot deja de responder ahí
 pnpm bandeja reanudar 56933334444              # quita la pausa (si nadie la tomó, sigue el chatbot)
 pnpm bandeja resolver 56933334444              # la cierra: el próximo mensaje lo atiende el chatbot
+pnpm bandeja recuerdo 56933334444              # lo que el chatbot recuerda del cliente
+pnpm bandeja olvidar 56933334444 [n]           # borra la nota n (o todas)
 ```
+
+**El recuerdo del cliente.** Entre conversaciones, el chatbot recuerda los últimos 3 pedidos del cliente
+(productos y fecha, sin montos) y hasta 8 notas breves que anota el modelo (método, molienda, su local…). Las
+notas nunca guardan montos, RUT, teléfonos, correos ni enlaces; el equipo las ve y las borra con
+`recuerdo` y `olvidar`.
 
 Una conversación que alguien del equipo tomó o respondió queda a su cargo hasta que la **resuelve**; reanudarla
 solo quita la pausa. `pnpm bandeja` usa la misma configuración del servidor: la base y el WhatsApp reales. Responder solo funciona
@@ -186,7 +195,16 @@ pnpm bandeja       # atender conversaciones (pnpm bandeja ayuda)
 pnpm semilla       # datos de ejemplo en la base de desarrollo
 pnpm local         # servidor real con WhatsApp y Khipu dobles, y el simulador web
 pnpm conversar     # conversar como cliente con el modo local
+pnpm banco         # casos reales contra el modelo de .env, con informe en .banco/ (gasta tokens)
 ```
+
+### El banco de conversaciones (modelo real)
+
+`pnpm banco` corre los casos de `local/banco/casos-de-*.ts` en la aplicación completa en memoria (con la
+semilla, WhatsApp y Khipu falsos) contra el **modelo real** de `.env`. Deja en `.banco/` un informe por
+esfuerzo con lo que leyó el cliente, tokens, latencias y fallos verificables. Opciones:
+`--esfuerzo low,medium,high`, `--casos saludo,precio` y `--salida carpeta`. Todo cambio de reglas, modelo o
+esfuerzo se mide con el banco antes de integrarlo.
 
 ### Pruebas de punta a punta (Playwright, sin navegador)
 

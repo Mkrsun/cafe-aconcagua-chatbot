@@ -21,6 +21,12 @@ El chatbot atiende a los clientes de Café por WhatsApp, con el número de Café
   en la bandeja hasta que alguien la retome, y mientras está pausada el chatbot no responde.
 - **Responde preguntas frecuentes** (horarios, retiro, medios de pago…), pero solo con lo que está en
   `definiciones/preguntas-frecuentes.ts`.
+- **Recomienda como alguien que sabe de café**: aconseja sobre métodos, molienda o cafeteras, y recomienda
+  cafés según sus notas de cata (`definiciones/perfiles.ts`). Nunca inventa sabores: si un café no tiene
+  notas, recomienda por formato y pregunta gustos.
+- **Recuerda al cliente**: cuando vuelve otro día, sabe qué pidió las últimas veces (sin montos) y lo que le
+  contó (cómo prepara su café, su local). Ante «lo mismo de la otra vez», arma ese pedido. El equipo ve y
+  borra lo que recuerda con `pnpm bandeja recuerdo` y `pnpm bandeja olvidar`.
 - **Cuida el gasto del modelo**: avisa al equipo cuando se usa el 50, el 80 y el 100 % del límite mensual. Al
   llegar al 100 % deja de usar el modelo y pasa los mensajes a la encargada hasta el mes siguiente.
 
@@ -46,10 +52,12 @@ aplica con `pnpm cargar`:
 | `catalogo.ts` | Los formatos que se venden (SKU, café, gramaje, si está disponible) y su precio minorista y mayorista en pesos. Un precio en `null` queda pendiente |
 | `despacho.ts` | Las zonas de despacho: qué comunas cubre cada una, cuánto cuesta, desde qué total es gratis y en cuántos días hábiles llega |
 | `preguntas-frecuentes.ts` | Las preguntas que el chatbot puede contestar, con su respuesta y su tema. Sin precios ni montos |
+| `perfiles.ts` | Las notas de cata de cada café (sabor, acidez, cuerpo, método ideal), hasta 300 caracteres y sin precios |
 
-`definiciones/catalogo.ts` ya trae los 39 formatos del catálogo de Café, con los precios pendientes. Las zonas
-de despacho y las preguntas frecuentes vienen vacías. **Antes de publicar, Café tiene que completar los
-precios, las zonas y las preguntas.** Mientras falten, el chatbot le pasa esas consultas a la encargada en vez
+`definiciones/catalogo.ts` ya trae los 39 formatos del catálogo de Café, con los precios pendientes.
+`perfiles.ts` trae los 20 cafés con las notas vacías. Las zonas de despacho y las preguntas frecuentes vienen
+vacías. **Antes de publicar, Café tiene que completar los precios, las zonas, las preguntas y las notas de
+cata.** Mientras falten, el chatbot le pasa esas consultas a la encargada en vez
 de inventar.
 
 `pnpm cargar` deja la base exactamente igual a las definiciones:
@@ -77,6 +85,8 @@ pnpm bandeja                                         # las que esperan a una per
 pnpm bandeja ver 56933334444                         # el hilo completo, con el motivo y el resumen
 pnpm bandeja responder 56933334444 --como Glei Hola, te llamo en cinco minutos
 pnpm bandeja resolver 56933334444                    # la cierra: el chatbot vuelve a atender
+pnpm bandeja recuerdo 56933334444                    # lo que el chatbot recuerda de ese cliente
+pnpm bandeja olvidar 56933334444 2                   # borra la nota 2 (sin número, todas)
 ```
 
 Una conversación se busca por el teléfono del cliente o por su id. Tu respuesta le llega al cliente por el
@@ -137,6 +147,9 @@ Todo se configura con variables de entorno en el servidor. La lista completa est
 
 ## Cómo seguir desarrollándolo con Claude Code
 
+La guía completa para tomar el proyecto desde cero (con otra cuenta de Claude Code) está en
+`docs/traspaso.md`: el estado, los PRs por integrar, lo que falta para publicar y las decisiones tomadas.
+
 El repo está preparado para trabajar con Claude Code (o con cualquier agente), y `CLAUDE.md` tiene las
 reglas. El camino para cualquier cambio:
 
@@ -144,6 +157,7 @@ reglas. El camino para cualquier cambio:
 2. Pídele a Claude que agregue o ajuste las **pruebas** del cambio junto con el código.
 3. Antes de dar algo por bueno: `pnpm verify` en verde y, si el cambio toca una conversación, `pnpm e2e`.
 4. Prueba el cambio en local con `pnpm local` y el simulador (ver `SETUP.md`).
+5. Si el cambio toca cómo habla el chatbot, mídelo con `pnpm banco` antes y después.
 
 Las líneas rojas no se negocian, ni siquiera a pedido: el precio sale del catálogo y nunca del modelo; el
 consentimiento del cliente manda; fuera de la ventana de 24 horas solo salen plantillas; el aviso al equipo no
