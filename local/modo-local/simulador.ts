@@ -2,6 +2,7 @@ import pg from "pg";
 import { crearAplicacion } from "../../launcher/composicion/aplicacion.js";
 import { bordesReales } from "../../launcher/composicion/bordes.js";
 import { leerConfiguracion } from "../../launcher/config/configuracion.js";
+import { RecuerdosDeClientes } from "../../src/clientes/index.js";
 import { relojDelSistema } from "../../src/plataforma/reloj.js";
 import { CLIENTES_DE_EJEMPLO } from "../clientes-de-ejemplo.js";
 import { ChatbotLocal } from "../conversar/chatbot-local.js";
@@ -42,6 +43,7 @@ export async function simuladorLocal(
       clientes: almacenes.clientes,
       aviso: servicios.aviso,
       responder: servicios.responderDesdeBandeja,
+      recuerdos: new RecuerdosDeClientes(almacenes.registros),
     },
   });
   return { simulador, cerrar: () => pool.end() };
