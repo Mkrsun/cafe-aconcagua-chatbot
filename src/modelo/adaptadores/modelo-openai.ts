@@ -5,7 +5,16 @@ import {
   type RespuestaDelModelo,
   type SolicitudAlModelo,
 } from "../puertos/modelo.js";
-import { interpretarRespuesta } from "./interpretar-respuesta.js";
+import type { FormatoDeApi } from "./formato.js";
+import { formatoChat } from "./formato-chat.js";
+import { formatoResponses } from "./formato-responses.js";
+
+export type ApiDelModelo = "responses" | "chat";
+
+const FORMATOS: Record<ApiDelModelo, FormatoDeApi> = {
+  responses: formatoResponses,
+  chat: formatoChat,
+};
 
 /** El `fetch` que usa el adaptador: inyectable para probar sin red. */
 export type FetchDelModelo = (
@@ -26,60 +35,40 @@ export interface ConfiguracionDelModelo {
   readonly reasoningEffort?: string;
   /** OpenAI (gpt-5+) pide `max_completion_tokens`; otros proveedores, `max_tokens`. */
   readonly parametroDeTokens?: "max_tokens" | "max_completion_tokens";
+  /** `responses` (OpenAI, admite razonamiento con la herramienta) o `chat` (otros proveedores). */
+  readonly api?: ApiDelModelo;
   readonly fetch?: FetchDelModelo;
 }
 
 /**
- * Cualquier API compatible con OpenAI (`/chat/completions`): función forzada y estricta, con
- * timeout. El proveedor es configuración: cambiarlo es cambiar base, clave y modelo.
+ * Una API compatible con OpenAI (`/responses` o `/chat/completions`): función forzada y estricta,
+ * con timeout. El proveedor es configuración: cambiarlo es cambiar base, clave, modelo y API.
  */
 export class ModeloOpenAI implements IModelo {
   constructor(private readonly config: ConfiguracionDelModelo) {}
 
   async completar(solicitud: SolicitudAlModelo): Promise<RespuestaDelModelo> {
+    const formato = FORMATOS[this.config.api ?? "responses"];
     const inicio = Date.now();
     const signal = AbortSignal.timeout(this.config.timeoutMs);
-    const datos = await this.llamar(this.cuerpo(solicitud), signal);
+    const cuerpo = JSON.stringify(formato.cuerpo(this.config, solicitud));
+    const datos = await this.llamar(formato.ruta, cuerpo, signal);
     const conLatencia = (m: Omit<MetricasDelModelo, "latenciaMs">) => ({
       ...m,
       latenciaMs: Date.now() - inicio,
     });
-    return interpretarRespuesta(datos, conLatencia);
-  }
-
-  private cuerpo(s: SolicitudAlModelo): string {
-    const { nombre, descripcion } = s.herramienta;
-    return JSON.stringify({
-      model: this.config.modelo,
-      [this.config.parametroDeTokens ?? "max_completion_tokens"]:
-        s.maxTokens ?? 2048,
-      ...(this.config.reasoningEffort
-        ? { reasoning_effort: this.config.reasoningEffort }
-        : {}),
-      messages: [
-        { role: "system", content: s.system },
-        { role: "user", content: s.user },
-      ],
-      tools: [
-        {
-          type: "function",
-          function: {
-            name: nombre,
-            description: descripcion,
-            parameters: s.schema,
-            strict: true,
-          },
-        },
-      ],
-      tool_choice: { type: "function", function: { name: nombre } },
-    });
+    return formato.interpretar(datos, conLatencia);
   }
 
   /** POST y lectura del cuerpo bajo el mismo `signal`: el timeout cubre ambos. */
-  private async llamar(body: string, signal: AbortSignal): Promise<unknown> {
+  private async llamar(
+    ruta: string,
+    body: string,
+    signal: AbortSignal,
+  ): Promise<unknown> {
     const fetch = this.config.fetch ?? (globalThis.fetch as FetchDelModelo);
     try {
-      const pedido = fetch(`${this.config.baseUrl}/chat/completions`, {
+      const pedido = fetch(`${this.config.baseUrl}${ruta}`, {
         method: "POST",
         headers: {
           "content-type": "application/json",
