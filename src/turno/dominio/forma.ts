@@ -40,7 +40,10 @@ export const botonPagar = (
   url,
 });
 
-/** Las filas de una lista: el nombre y el precio del tramo; un SKU sin precio la descarta. */
+/**
+ * Las filas de una lista: el nombre y el precio del tramo. Un SKU sin precio (o que no existe)
+ * queda fuera; sin ninguna fila, la respuesta va en texto.
+ */
 function lista(
   cuerpo: string,
   skus: readonly string[],
@@ -58,12 +61,13 @@ function lista(
       descripcion: recortar(detalle, LIMITES.descripcionDeFila),
     };
   });
-  if (!filas.length || filas.some((f) => !f)) return undefined;
+  const conPrecio = filas.filter((f) => f !== undefined);
+  if (!conPrecio.length) return undefined;
   return siEsValido({
     tipo: "lista",
     cuerpo,
     boton: "Ver cafés",
-    secciones: [{ filas: filas.map((f) => f!) }],
+    secciones: [{ filas: conPrecio }],
   });
 }
 
