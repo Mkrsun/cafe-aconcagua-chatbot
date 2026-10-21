@@ -79,7 +79,7 @@ GitHub cada PR muestra solo sus propios cambios. Se integran **en orden**, del #
 | [#5](https://github.com/Mkrsun/cafe-aconcagua-chatbot/pull/5) | `feat/turno-voz` | Voz más cálida y natural (de 18/22 a 22/22 en el banco) |
 | [#6](https://github.com/Mkrsun/cafe-aconcagua-chatbot/pull/6) | `feat/catalogo-perfiles` | Notas de cata por café (plantilla vacía para completar) |
 | [#7](https://github.com/Mkrsun/cafe-aconcagua-chatbot/pull/7) | `feat/clientes-memoria` | Memoria del cliente entre conversaciones |
-| #8 | `docs/traspaso` | Esta guía y la documentación al día |
+| [#8](https://github.com/Mkrsun/cafe-aconcagua-chatbot/pull/8) | `docs/traspaso` | Esta guía y la documentación al día |
 
 Para cada PR, en orden: primero se apunta a `main` (como ya contiene a los anteriores, solo quedan sus
 cambios) y después se integra. Con el #1, que ya apunta a `main`, basta el segundo paso:
