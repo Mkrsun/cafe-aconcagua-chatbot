@@ -22,12 +22,26 @@ export interface DepsDelTurno {
   >;
   /** Las notas de cata de cada café (las carga `pnpm cargar`). */
   readonly perfiles: () => Promise<readonly PerfilDeCafe[]>;
+  /** Lo que se recuerda del cliente entre conversaciones, y dónde anotar lo nuevo. */
+  readonly memoria: {
+    leer(clienteId: string): Promise<RecuerdoParaElTurno>;
+    anotar(clienteId: string, notas: readonly string[]): Promise<void>;
+  };
   readonly registrarPedido: (p: PedidoNuevo) => Promise<void>;
   /** El enlace de Khipu, o `undefined` si no hay cobro automático. */
   readonly cobrar: (pedidoId: string) => Promise<{ url: string } | undefined>;
   readonly reloj: Reloj;
   /** `CAFE_ROL_ENCARGADO`. */
   readonly rol: string;
+}
+
+/** Lo que el turno sabe del cliente de otras conversaciones: notas y pedidos, sin montos. */
+export interface RecuerdoParaElTurno {
+  readonly notas: readonly string[];
+  readonly pedidosAnteriores: readonly {
+    readonly fecha: string;
+    readonly productos: readonly string[];
+  }[];
 }
 
 export interface ClienteDelTurno {
@@ -66,6 +80,7 @@ export interface TurnoEnCurso {
   readonly tarifas: readonly TarifaDeDespacho[];
   readonly faq: readonly { pregunta: string; respuesta: string }[];
   readonly perfiles: readonly PerfilDeCafe[];
+  readonly recuerdo: RecuerdoParaElTurno;
   readonly ahora: Date;
   estado: EstadoDelTurno;
   inferencias: number;

@@ -37,7 +37,7 @@ export const ESTADO_INICIAL: EstadoDelTurno = {
   intercambios: [],
   refs: [],
 };
-export const INTERCAMBIOS = 6;
+export const INTERCAMBIOS = 10;
 const REFS = 8;
 const DIA_MS = 86_400_000;
 

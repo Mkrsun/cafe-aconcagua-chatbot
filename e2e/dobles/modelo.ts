@@ -17,6 +17,7 @@ const POR_DEFECTO: DecisionDelTurno = {
   despacho: "",
   forma: { tipo: "texto", opciones: [], skus: [] },
   response: "¡Hola! ¿En qué te puedo ayudar hoy?",
+  recordar: [],
 };
 
 interface CuerpoDelModelo {
