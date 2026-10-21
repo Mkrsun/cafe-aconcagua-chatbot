@@ -70,9 +70,13 @@ export function renderizarPrecios(texto: string, p: Precios) {
     const nombre =
       p.foto.formatos.find((f) => f.familia === id)?.familiaNombre ?? id;
     if (!formatos.length) return `${nombre}: ${TEXTOS.noDisponible}`;
+    const lineas = formatos.map((f) => [etiquetaDelFormato(f), precioDe(f)]);
+    // Una lista entera de «por confirmar» no informa nada y alarga el mensaje.
+    if (lineas.every(([, precio]) => precio === TEXTOS.porConfirmar))
+      return `${nombre}: ${TEXTOS.porConfirmar}`;
     return [
       `${nombre}:`,
-      ...formatos.map((f) => `- ${etiquetaDelFormato(f)}: ${precioDe(f)}`),
+      ...lineas.map(([etiqueta, precio]) => `- ${etiqueta}: ${precio}`),
     ].join("\n");
   };
   const escrito = texto.replace(

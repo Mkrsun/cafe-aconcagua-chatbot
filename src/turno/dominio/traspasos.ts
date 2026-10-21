@@ -18,6 +18,7 @@ export const porEnojo = (
   texto: string,
   senales: readonly SenalDeEnojo[],
 ): PedidoDeTraspaso => ({
+  ...(senales.includes("pide-persona") ? { apertura: "Claro, con gusto" } : {}),
   tipo: "caso",
   motivo: senales.includes("pide-persona")
     ? "El cliente pidió hablar con una persona"
@@ -28,7 +29,11 @@ export const porEnojo = (
 export const porPrecioPendiente = (
   texto: string,
   sku: string,
+  cafe?: string,
 ): PedidoDeTraspaso => ({
+  ...(cafe
+    ? { apertura: `El precio de ${cafe} todavía no lo tengo confirmado` }
+    : {}),
   tipo: "consulta",
   motivo: `Precio pendiente de ${sku}: el cliente quiere pedirlo`,
   resumen: resumen(

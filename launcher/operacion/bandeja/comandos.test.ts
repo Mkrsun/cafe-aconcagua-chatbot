@@ -72,7 +72,7 @@ describe("pnpm bandeja", () => {
     const m = await conUnTraspaso();
     const hilo = await m.bandeja(["ver", TELEFONO]);
     expect(hilo.join("\n")).toContain("Cliente: quiero hablar con una persona");
-    expect(hilo.join("\n")).toContain("Chatbot: Te entiendo");
+    expect(hilo.join("\n")).toContain("Chatbot: Claro, con gusto");
   });
 
   it("responder envía por WhatsApp y deja la conversación a cargo de quien respondió", async () => {
