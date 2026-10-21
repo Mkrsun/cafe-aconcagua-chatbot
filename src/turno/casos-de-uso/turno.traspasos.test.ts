@@ -50,6 +50,39 @@ describe("el turno: reclamos, enojo, límites y cierres", () => {
     });
   });
 
+  it("una comuna sin tarifa es un traspaso de despacho que la nombra", async () => {
+    const m = await mundoDelTurno([
+      decision({ action: "DERIVAR", despacho: "Puente Alto" }),
+    ]);
+    const r = await m.atender("¿despachan a Puente Alto?");
+    expect(r.traspaso).toMatchObject({
+      tipo: "consulta",
+      motivo: "Despacho a «Puente Alto» sin tarifa definida",
+      apertura: "A Puente Alto todavía no tengo una tarifa de despacho",
+    });
+  });
+
+  it("DERIVAR usa la frase del modelo como apertura, salvo si promete", async () => {
+    const m = await mundoDelTurno([
+      decision({
+        intent: "informacion",
+        action: "DERIVAR",
+        faltantes: ["factura"],
+        response:
+          "Sobre la factura para tu cafetería, quiero darte el dato exacto.",
+      }),
+      decision({
+        intent: "informacion",
+        action: "DERIVAR",
+        response: "La encargada te escribe en un ratito con el dato",
+      }),
+    ]);
+    expect((await m.atender("¿emiten factura?")).traspaso?.apertura).toBe(
+      "Sobre la factura para tu cafetería, quiero darte el dato exacto",
+    );
+    expect((await m.atender("¿y boleta?")).traspaso?.apertura).toBeUndefined();
+  });
+
   it("un «gracias» suelto se responde con una reacción 👍, sin inferir", async () => {
     const m = await mundoDelTurno([]);
     const r = await m.atender("muchas gracias 🙏", "wamid.9");

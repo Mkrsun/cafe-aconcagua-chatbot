@@ -16,6 +16,8 @@ export interface PedidoDeTraspaso {
   readonly tipo: TipoDeTraspaso;
   readonly motivo: string;
   readonly resumen: string;
+  /** Lo que el cliente lee primero, nombrando el tema; sin ella, la apertura genérica. */
+  readonly apertura?: string;
 }
 
 /**
@@ -34,7 +36,7 @@ export class Traspasar {
       conversacionId: p.conversacion.id,
     });
     await this.deps.bandeja.pausar(p.conversacion.id, p.motivo, p.resumen);
-    const textos = traspaso(this.deps.rol, p.tipo);
+    const textos = traspaso(this.deps.rol, p.tipo, p.apertura);
     return avisado ? textos.avisado : textos.sinAviso;
   }
 }

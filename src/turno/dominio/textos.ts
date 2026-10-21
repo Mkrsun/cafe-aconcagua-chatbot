@@ -5,6 +5,9 @@ export const TEXTOS = {
   sinEnlace: "Todavía no hay un link de pago activo.",
   precioCambio:
     "Ojo: el precio cambió desde el resumen anterior, así que te lo dejo actualizado.",
+  despachoCambio:
+    "Ojo: el despacho cambió desde el resumen anterior, así que te lo dejo actualizado.",
+  queTeGustaria: "¡Cuéntame qué café te gustaría y lo armamos!",
   noDisponible: "por ahora no lo tenemos disponible",
   porConfirmar: "precio por confirmar",
   cierreDelResumen: "¿Lo dejamos así?",

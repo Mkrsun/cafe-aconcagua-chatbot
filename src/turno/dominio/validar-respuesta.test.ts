@@ -19,6 +19,8 @@ describe("lo que el modelo no puede escribir", () => {
     ["Ya despachamos tu pedido", "estado_afirmado"],
     ["Paga en https://khipu.com/x", "enlace_en_prosa"],
     ["El despacho: {{despacho}}", "despacho_sin_zona"],
+    ["Te recomiendo el Siete Tazas, SKU 0089", "codigo_visible"],
+    ["El Futaleufú (0028) viene molido", "codigo_visible"],
   ])("«%s» ⇒ %s", (texto, codigo) => {
     expect(revisar(texto)).toContain(codigo);
   });
@@ -31,6 +33,7 @@ describe("lo que el modelo no puede escribir", () => {
     "Atendemos de 10:00 a 14:00",
     "La bolsa de 1.000 gramos viene en grano",
     "Te llega en 2 días hábiles",
+    "Somos 20 personas en la oficina",
   ])("«%s» pasa", (texto) => {
     expect(revisar(texto)).toEqual([]);
   });

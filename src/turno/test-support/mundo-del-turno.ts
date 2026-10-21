@@ -111,5 +111,6 @@ export async function mundoDelTurno(
     reloj,
     registros,
     pendientes,
+    tarifas,
   };
 }

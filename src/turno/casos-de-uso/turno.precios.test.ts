@@ -51,7 +51,7 @@ describe("el turno: precios desde el catálogo, nunca del modelo", () => {
     expect(r.texto).toBe("");
   });
 
-  it("una lista de cafés lleva precios del catálogo; un SKU sin precio la descarta", async () => {
+  it("una lista lleva solo los cafés con precio del tramo; sin ninguno, va en texto", async () => {
     const m = await mundoDelTurno(
       [
         decision({
@@ -61,6 +61,10 @@ describe("el turno: precios desde el catálogo, nunca del modelo", () => {
         decision({
           response: "Mira estos:",
           forma: { tipo: "lista", opciones: [], skus: ["0025", "0040"] },
+        }),
+        decision({
+          response: "Y este:",
+          forma: { tipo: "lista", opciones: [], skus: ["0040"] },
         }),
       ],
       { tramo: "mayorista" },
@@ -77,7 +81,12 @@ describe("el turno: precios desde el catálogo, nunca del modelo", () => {
         },
       ],
     });
-    expect((await m.atender("¿y otros?")).contenido).toBeUndefined();
+    // 0040 no tiene precio mayorista: queda fuera, sin perder la lista.
+    expect((await m.atender("¿y otros?")).contenido).toMatchObject({
+      tipo: "lista",
+      secciones: [{ filas: [{ id: "sku:0025" }] }],
+    });
+    expect((await m.atender("¿y ese?")).contenido).toBeUndefined();
   });
 
   it("el mismo lote dos veces no vuelve a inferir", async () => {

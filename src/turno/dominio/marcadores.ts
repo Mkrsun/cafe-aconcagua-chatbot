@@ -10,6 +10,14 @@ import { precioPorConfirmar, TEXTOS } from "./textos.js";
 /** `{{precio:SKU}}` (un formato) y `{{precios:FAMILIA}}` (los formatos de un café). */
 export const MARCADOR_DE_PRECIO = /\{\{(precios?):([^{}]*)\}\}/g;
 
+/** El texto sin los marcadores de precio (el resumen ya trae cada monto). */
+export const sinMarcadoresDePrecio = (texto: string) =>
+  texto
+    .replace(MARCADOR_DE_PRECIO, "")
+    .replace(/[ \t]+([.,;:!?])/g, "$1")
+    .replace(/[ \t]{2,}/g, " ")
+    .trim();
+
 /** Los marcadores cuyo SKU o familia no existe en el catálogo: se reparan. */
 export function marcadoresInvalidos(
   texto: string,

@@ -7,6 +7,8 @@ export interface PedidoDeTraspaso {
   readonly motivo: string;
   /** Dos líneas: qué dijo el cliente y qué hacer para retomarlo. */
   readonly resumen: string;
+  /** Lo que el cliente lee antes de «le paso tu consulta a…»: nombra el tema. */
+  readonly apertura?: string;
 }
 
 const resumen = (texto: string, queHacer: string) =>
@@ -41,6 +43,7 @@ export const porZonaSinTarifa = (
 ): PedidoDeTraspaso => ({
   tipo: "consulta",
   motivo: `Despacho a «${zona}» sin tarifa definida`,
+  apertura: `A ${zona} todavía no tengo una tarifa de despacho`,
   resumen: resumen(
     texto,
     `Definir el despacho a ${zona} en Despacho, o cotizarle a mano.`,
@@ -50,7 +53,9 @@ export const porZonaSinTarifa = (
 export const porFaltaDeDato = (
   texto: string,
   faltantes: readonly string[],
+  apertura?: string,
 ): PedidoDeTraspaso => ({
+  ...(apertura ? { apertura } : {}),
   tipo: "consulta",
   motivo: faltantes.length
     ? `El chatbot no tiene el dato: ${faltantes.join(", ")}`
@@ -61,7 +66,11 @@ export const porFaltaDeDato = (
   ),
 });
 
-export const porDerivacion = (texto: string): PedidoDeTraspaso => ({
+export const porDerivacion = (
+  texto: string,
+  apertura?: string,
+): PedidoDeTraspaso => ({
+  ...(apertura ? { apertura } : {}),
   tipo: "caso",
   motivo: "El chatbot pidió que lo vea una persona",
   resumen: resumen(texto, "Escríbele desde la bandeja para retomar su caso."),
