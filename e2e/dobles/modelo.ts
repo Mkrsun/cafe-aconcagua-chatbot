@@ -19,30 +19,38 @@ const POR_DEFECTO: DecisionDelTurno = {
   response: "¡Hola! ¿En qué te puedo ayudar hoy?",
 };
 
+interface CuerpoDelModelo {
+  messages?: { role: string; content: string }[];
+  input?: { role: string; content: string }[];
+}
+
 /**
- * El modelo guionado, compatible con OpenAI (`/chat/completions`): entrega por `decidir_turno` la
- * siguiente decisión del guion del cliente, que se reconoce por su nombre en el contexto del turno.
+ * El modelo guionado, compatible con OpenAI (`/responses` y `/chat/completions`): entrega por
+ * `decidir_turno` la siguiente decisión del guion del cliente, que se reconoce por su nombre en el
+ * contexto del turno.
  */
 export function crearModelo() {
   const guiones = new Map<string, DecisionDelTurno[]>();
   const llamadas: LlamadaAlModelo[] = [];
+  const decidir = (cuerpo: CuerpoDelModelo) => {
+    const mensajes = cuerpo.input ?? cuerpo.messages ?? [];
+    const usuario = mensajes.find((m) => m.role === "user")?.content ?? "{}";
+    const contexto = JSON.parse(usuario) as {
+      cliente?: { nombre?: string };
+      mensaje?: string;
+    };
+    const cliente = contexto.cliente?.nombre ?? "desconocido";
+    llamadas.push({ cliente, mensaje: contexto.mensaje ?? "" });
+    return JSON.stringify(guiones.get(cliente)?.shift() ?? POR_DEFECTO);
+  };
   return {
     registrar(app: Hono) {
-      app.post("/llm/v1/chat/completions", async (c) => {
-        const cuerpo = await c.req.json<{
-          messages?: { role: string; content: string }[];
-        }>();
-        const usuario =
-          cuerpo.messages?.find((m) => m.role === "user")?.content ?? "{}";
-        const contexto = JSON.parse(usuario) as {
-          cliente?: { nombre?: string };
-          mensaje?: string;
-        };
-        const cliente = contexto.cliente?.nombre ?? "desconocido";
-        llamadas.push({ cliente, mensaje: contexto.mensaje ?? "" });
-        const decision = guiones.get(cliente)?.shift() ?? POR_DEFECTO;
-        return c.json(respuesta(decision));
-      });
+      app.post("/llm/v1/responses", async (c) =>
+        c.json(respuestaResponses(decidir(await c.req.json()))),
+      );
+      app.post("/llm/v1/chat/completions", async (c) =>
+        c.json(respuestaChat(decidir(await c.req.json()))),
+      );
       app.post("/__dobles/modelo/guion", async (c) => {
         const { cliente, decisiones } = await c.req.json<{
           cliente: string;
@@ -56,7 +64,15 @@ export function crearModelo() {
   };
 }
 
-const respuesta = (decision: DecisionDelTurno) => ({
+const respuestaResponses = (argumentos: string) => ({
+  status: "completed",
+  output: [
+    { type: "function_call", name: "decidir_turno", arguments: argumentos },
+  ],
+  usage: { input_tokens: 1000, output_tokens: 50 },
+});
+
+const respuestaChat = (argumentos: string) => ({
   choices: [
     {
       finish_reason: "stop",
@@ -64,10 +80,7 @@ const respuesta = (decision: DecisionDelTurno) => ({
         tool_calls: [
           {
             type: "function",
-            function: {
-              name: "decidir_turno",
-              arguments: JSON.stringify(decision),
-            },
+            function: { name: "decidir_turno", arguments: argumentos },
           },
         ],
       },

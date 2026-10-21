@@ -9,6 +9,8 @@ export interface Configuracion {
   readonly databaseUrl?: string;
   readonly modelo: {
     readonly baseUrl: string;
+    /** `responses` (OpenAI, razonamiento con herramienta) o `chat` (otros proveedores). */
+    readonly api: "responses" | "chat";
     readonly apiKey: string;
     readonly nombre: string;
     readonly timeoutMs: number;

@@ -148,8 +148,9 @@ arranque lo rechaza. El servidor no tiene más rutas: no hay admin ni API de ope
 | `DATABASE_URL` | PostgreSQL | en memoria |
 | `OPENAI_API_KEY` | Clave del proveedor del modelo (cualquier API compatible con OpenAI) | obligatoria |
 | `CAFE_MODELO_BASE_URL` | Base de la API compatible con OpenAI | `https://api.openai.com/v1` |
+| `CAFE_MODELO_API` | `responses` (OpenAI, admite razonamiento) o `chat` (`/chat/completions`, otros proveedores) | `responses` |
 | `CAFE_MODELO` | Modelo del turno | `gpt-6-luna` |
-| `CAFE_MODELO_ESFUERZO` | Esfuerzo de razonamiento, si el modelo lo admite | — |
+| `CAFE_MODELO_ESFUERZO` | Esfuerzo de razonamiento (`none`, `low`, `medium`, `high`), si el modelo lo admite | — |
 | `CAFE_MODELO_TIMEOUT_MS` | Tope de cada inferencia | `25000` |
 | `CAFE_MODELO_TARIFA_USD_POR_MTOK` | Tarifa `entrada,cacheada,salida` en USD por millón de tokens | obligatoria en producción |
 | `CAFE_LIMITE_GASTO_USD_MES` | Límite mensual del modelo (mes de Chile) | `50` |
