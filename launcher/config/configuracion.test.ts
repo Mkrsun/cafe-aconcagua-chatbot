@@ -26,6 +26,7 @@ describe("configuración por entorno", () => {
       },
       modelo: {
         baseUrl: "https://api.openai.com/v1",
+        api: "responses",
         nombre: "gpt-6-luna",
         timeoutMs: 25_000,
         limiteUSD: 50,
@@ -70,6 +71,18 @@ describe("configuración por entorno", () => {
       apiKey: "khipu",
       base: "https://payment-api.khipu.com/v3",
     });
+  });
+
+  it("lee la API y el esfuerzo del modelo; una API desconocida no arranca", () => {
+    const c = leerConfiguracion({
+      ...minima,
+      CAFE_MODELO_API: "chat",
+      CAFE_MODELO_ESFUERZO: "low",
+    });
+    expect(c.modelo).toMatchObject({ api: "chat", reasoningEffort: "low" });
+    expect(() =>
+      leerConfiguracion({ ...minima, CAFE_MODELO_API: "completions" }),
+    ).toThrow(/CAFE_MODELO_API/);
   });
 
   it("sin clave del modelo no arranca; una tarifa mal escrita tampoco", () => {

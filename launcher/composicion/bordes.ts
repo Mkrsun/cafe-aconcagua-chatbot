@@ -20,6 +20,7 @@ export function bordesReales(config: Configuracion): Bordes {
   return {
     modelo: new ModeloOpenAI({
       baseUrl: modelo.baseUrl,
+      api: modelo.api,
       apiKey: modelo.apiKey,
       modelo: modelo.nombre,
       timeoutMs: modelo.timeoutMs,

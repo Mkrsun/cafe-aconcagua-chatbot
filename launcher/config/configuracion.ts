@@ -11,6 +11,15 @@ import type { Configuracion } from "./tipos.js";
 export type { Configuracion };
 
 const TARIFA = "CAFE_MODELO_TARIFA_USD_POR_MTOK";
+const APIS = ["responses", "chat"] as const;
+
+function api(env: Entorno): Configuracion["modelo"]["api"] {
+  const valor = texto(env, "CAFE_MODELO_API") ?? "responses";
+  const elegida = APIS.find((a) => a === valor);
+  if (!elegida)
+    throw new Error(`CAFE_MODELO_API debe ser uno de: ${APIS.join(", ")}`);
+  return elegida;
+}
 
 function modelo(env: Entorno): Configuracion["modelo"] {
   const apiKey = texto(env, "OPENAI_API_KEY");
@@ -22,6 +31,7 @@ function modelo(env: Entorno): Configuracion["modelo"] {
   const esfuerzo = texto(env, "CAFE_MODELO_ESFUERZO");
   return {
     baseUrl: texto(env, "CAFE_MODELO_BASE_URL") ?? "https://api.openai.com/v1",
+    api: api(env),
     apiKey,
     nombre: texto(env, "CAFE_MODELO") ?? "gpt-6-luna",
     timeoutMs: entero(env, "CAFE_MODELO_TIMEOUT_MS", 25_000),
