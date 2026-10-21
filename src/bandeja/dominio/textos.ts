@@ -17,19 +17,21 @@ const APERTURAS = {
 /**
  * El traspaso como lo diría una vendedora que llama a su encargada, nunca un bot que "deriva". El
  * rol sale de configuración (`CAFE_ROL_ENCARGADO`). `avisado` promete "en un ratito" solo si el
- * aviso al equipo salió; `sinAviso` es honesto: el caso quedó en la bandeja.
+ * aviso al equipo salió; `sinAviso` es honesto: el caso quedó en la bandeja. Una `apertura` que
+ * nombra el tema («A Puente Alto todavía no tengo…») reemplaza la genérica; la promesa no cambia.
  */
-export function traspaso(rol: string, tipo: TipoDeTraspaso) {
+export function traspaso(rol: string, tipo: TipoDeTraspaso, apertura?: string) {
   const quien = rol.trim() || ROL_POR_DEFECTO;
   if (tipo === "pedido")
     return {
       avisado: `¡Buenísimo! Le paso tu pedido a ${quien} para que lo deje listo, ${PRONTO}`,
       sinAviso: `¡Buenísimo! Le dejé tu pedido a ${quien} para que lo deje listo; ${POR_ESTE_CHAT}`,
     };
-  const [apertura, asunto] = APERTURAS[tipo];
+  const [generica, asunto] = APERTURAS[tipo];
+  const inicio = apertura?.trim() || generica;
   return {
-    avisado: `${apertura}: le paso ${asunto} a ${quien}, que ${PRONTO.replace("y ", "")}`,
-    sinAviso: `${apertura}: le dejé ${asunto} a ${quien}, que ${POR_ESTE_CHAT}`,
+    avisado: `${inicio}: le paso ${asunto} a ${quien}, que ${PRONTO.replace("y ", "")}`,
+    sinAviso: `${inicio}: le dejé ${asunto} a ${quien}, que ${POR_ESTE_CHAT}`,
   };
 }
 

@@ -19,6 +19,18 @@ describe("textos del traspaso", () => {
     );
   });
 
+  it("una apertura que nombra el tema reemplaza la genérica, sin cambiar la promesa", () => {
+    const apertura = "A Puente Alto todavía no tengo una tarifa de despacho";
+    expect(traspaso("la encargada", "consulta", apertura).avisado).toBe(
+      "A Puente Alto todavía no tengo una tarifa de despacho: le paso tu consulta a la " +
+        "encargada, que te escribe por aquí en un ratito.",
+    );
+    expect(traspaso("la encargada", "caso", apertura).sinAviso).toBe(
+      "A Puente Alto todavía no tengo una tarifa de despacho: le dejé tu caso a la encargada, " +
+        "que te va a contactar por este mismo chat.",
+    );
+  });
+
   it("ningún texto fijo habla como bot", () => {
     const todos = (["caso", "consulta", "revision", "pedido"] as const).flatMap(
       (t) => Object.values(traspaso("la encargada", t)),
