@@ -285,12 +285,13 @@ gasto del mes mientras pruebas.
 
 **Qué proveedor conectar.** Por defecto, **OpenAI** (punto 1). Sirve cualquier proveedor **compatible con la
 API de OpenAI** (`/chat/completions` con llamadas a funciones), por ejemplo OpenRouter, Groq o Together. Se
-cambia en `.env` con tres líneas:
+cambia en `.env` con cuatro líneas:
 
 ```bash
 OPENAI_API_KEY=la-clave-de-ese-proveedor        # se llama así aunque el proveedor sea otro
 CAFE_MODELO_BASE_URL=https://openrouter.ai/api/v1   # la dirección que indica el proveedor
 CAFE_MODELO=nombre-del-modelo                    # tal como lo escribe el proveedor
+CAFE_MODELO_API=chat                             # con OpenAI se deja en responses (el valor por defecto)
 ```
 
 El modelo tiene que saber **llamar funciones** (function calling / tools): el chatbot le pide su decisión de
