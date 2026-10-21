@@ -13,5 +13,7 @@ deploy/respaldos.log
 .data/
 dist/
 coverage/
+# Informes de `pnpm banco` (conversaciones con el modelo real)
+.banco/
 # Resultados de Playwright
 e2e/.resultados/

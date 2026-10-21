@@ -18,6 +18,7 @@
     "semilla": "node --env-file-if-exists=.env --import tsx local/semilla/main.ts",
     "local": "node --env-file-if-exists=.env --import tsx local/modo-local/main.ts",
     "conversar": "node --env-file-if-exists=.env --import tsx local/conversar/main.ts",
+    "banco": "node --env-file-if-exists=.env --import tsx local/banco/main.ts",
     "legibilidad": "node scripts/lineas-largas.mjs",
     "e2e:smoke": "playwright test e2e/smoke",
     "e2e:critical": "playwright test e2e/critical",
