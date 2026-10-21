@@ -7,7 +7,8 @@ export type CodigoDeViolacion =
   | "estado_afirmado"
   | "enlace_en_prosa"
   | "despacho_sin_zona"
-  | "sku_inexistente";
+  | "sku_inexistente"
+  | "codigo_visible";
 
 export interface Violacion {
   readonly codigo: CodigoDeViolacion;
@@ -33,6 +34,16 @@ const ESTADO = new RegExp(
   ].join("|"),
 );
 const ENLACE = /https?:\/\//i;
+
+/** «SKU», o un código del catálogo fuera de un marcador: el cliente no conoce los códigos. */
+function nombraCodigo(texto: string, foto: FotoDelCatalogo) {
+  const prosa = texto.replace(/\{\{[^{}]*\}\}/g, " ");
+  if (/\bsku\b/i.test(prosa)) return true;
+  const codigos = foto.formatos.map((f) => f.sku).filter((s) => s.length >= 4);
+  return codigos.some((c) =>
+    new RegExp(`(?<![\\d.])${c}(?![\\d.])`).test(prosa),
+  );
+}
 
 const sinTildes = (t: string) =>
   t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
@@ -62,6 +73,11 @@ export function violaciones(
     );
   if (ENLACE.test(texto))
     agregar("enlace_en_prosa", "no escribas enlaces: usa {{pago}}");
+  if (nombraCodigo(texto, contexto.foto))
+    agregar(
+      "codigo_visible",
+      "no muestres SKU ni códigos al cliente: nombra el café y su formato",
+    );
   if (texto.includes("{{despacho}}") && !contexto.hayZona)
     agregar(
       "despacho_sin_zona",
