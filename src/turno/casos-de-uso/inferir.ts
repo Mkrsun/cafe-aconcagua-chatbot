@@ -46,6 +46,7 @@ export async function inferir(t: TurnoEnCurso): Promise<DecisionDelTurno> {
       estado: t.estado,
       cliente: t.entrada.cliente,
       faq: t.faq,
+      perfiles: t.perfiles,
       zonas: zonasVisibles(t.tarifas),
       texto: t.entrada.texto,
       ahora: t.ahora,

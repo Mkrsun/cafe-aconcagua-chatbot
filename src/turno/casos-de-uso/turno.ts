@@ -78,10 +78,11 @@ export class Turno {
     entrada: EntradaDelTurno,
     estado: EstadoDelTurno,
   ): Promise<TurnoEnCurso> {
-    const [foto, tarifas, faq] = await Promise.all([
+    const [foto, tarifas, faq, perfiles] = await Promise.all([
       this.deps.catalogo(),
       this.deps.tarifas(),
       this.deps.faq(),
+      this.deps.perfiles(),
     ]);
     const ahora = this.deps.reloj();
     return {
@@ -90,6 +91,7 @@ export class Turno {
       foto,
       tarifas,
       faq,
+      perfiles,
       ahora,
       estado,
       inferencias: 0,
