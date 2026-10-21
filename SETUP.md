@@ -274,7 +274,7 @@ El proyecto está preparado para que lo sigas mejorando con Claude Code, sin esc
    Usa el modelo real (gasta tokens de tu cuenta) y deja un informe en la carpeta `.banco/` con cada
    conversación tal como la leería el cliente.
 
-Para tomar el proyecto desde cero con otra cuenta (qué está hecho, qué PRs faltan por integrar y qué falta
+Para tomar el proyecto desde cero con otra cuenta (qué está hecho, qué decisiones se tomaron y qué falta
 para publicar), lee `docs/traspaso.md`.
 
 Hay cosas que Claude no va a hacer aunque se lo pidas, porque protegen el negocio: el precio siempre sale del
