@@ -16,6 +16,24 @@ describe("el turno: reclamos, enojo, límites y cierres", () => {
       },
     });
     expect(r.traspaso?.resumen).toContain("quiero hablar con una persona");
+    expect(r.traspaso?.apertura).toBe("Claro, con gusto");
+  });
+
+  it("pedir un café sin precio cargado traspasa nombrando el café", async () => {
+    const m = await mundoDelTurno(
+      [
+        decision({
+          action: "PROPONER",
+          changes: [{ sku: "0040", cantidad: 2 }],
+        }),
+      ],
+      { tramo: "mayorista" },
+    );
+    const r = await m.atender("quiero 2 cerro alegre");
+    expect(r.traspaso).toMatchObject({
+      tipo: "consulta",
+      apertura: "El precio de Cerro Alegre todavía no lo tengo confirmado",
+    });
   });
 
   it("un reclamo tranquilo lo atiende el chatbot y queda registrado para el equipo", async () => {

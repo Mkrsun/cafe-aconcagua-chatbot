@@ -149,8 +149,7 @@ function escenario(pool?: () => Promise<pg.Pool>) {
       ],
     });
     expect(m.canal.a(OTRO).map((x) => x.texto)).toEqual([
-      "Te entiendo, y quiero que esto quede bien resuelto: le paso tu caso a la encargada, " +
-        "que te escribe por aquí en un ratito.",
+      "Claro, con gusto: le paso tu caso a la encargada, que te escribe por aquí en un ratito.",
     ]);
     expect(await m.almacenes.bandeja.listar("pausada")).toEqual([
       expect.objectContaining({

@@ -34,6 +34,16 @@ describe("marcadores de precio: el sistema escribe los montos", () => {
     );
   });
 
+  it("{{precios:FAMILIA}} sin ningún precio cargado va en una sola línea", () => {
+    const r = renderizarPrecios("Mira:\n{{precios:cerro-alegre}}", {
+      foto,
+      tramo: "mayorista",
+      rol: "la encargada",
+    });
+    expect(r.texto).toMatch(/^Mira:\nCerro Alegre: precio por confirmar\nEs/);
+    expect(r.texto).not.toContain("- ");
+  });
+
   it("un precio sin cargar se dice «por confirmar» y lo confirma la encargada", () => {
     const r = renderizarPrecios("El Cerro Alegre está a {{precio:0040}}.", {
       foto,

@@ -70,8 +70,13 @@ export async function resolverTurno(
       (await sinModelo(t)) ?? (await ejecutarDecision(t, await inferir(t)))
     );
   } catch (error) {
-    if (error instanceof PrecioPendiente)
-      return traspasar(t, porPrecioPendiente(texto, error.sku));
+    if (error instanceof PrecioPendiente) {
+      const cafe = t.foto.formatos.find((f) => f.sku === error.sku);
+      return traspasar(
+        t,
+        porPrecioPendiente(texto, error.sku, cafe?.familiaNombre),
+      );
+    }
     if (error instanceof LimiteDeGastoAlcanzado)
       return traspasar(t, porRevision(texto, error.message));
     if (error instanceof TurnoSinDecision)
